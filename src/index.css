@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* OFSTED Prep Design System - Clean, Professional UI */
+
+@layer base {
+  :root {
+    /* Base colors - clean, professional palette */
+    --background: 0 0% 100%;
+    --foreground: 210 11% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 11% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 11% 15%;
+
+    --primary: 204 49% 22%;              /* #1B3C53 */
+     --primary-foreground: 0 0% 100%;
+    --primary-light: 223 100% 15%;
+    --primary-dark: 223 100% 5%;
+
+    /* Neutral grays for clean interface */
+    --secondary: 210 20% 98%;
+    --secondary-foreground: 210 11% 15%;
+
+    --muted: 210 20% 96%;
+    --muted-foreground: 210 8% 46%;
+
+    --accent: 210 20% 96%;
+    --accent-foreground: 210 11% 15%;
+
+    /* Status colors */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders and inputs */
+    --border: 210 20% 90%;
+    --input: 210 20% 96%;
+    --ring: 223 100% 8%;
+
+    --radius: 0.5rem;
+
+    /* Sidebar colors */
+    --sidebar-background: 0 0% 100%;     /* white */
+    --sidebar-foreground: 210 11% 15%;
+    --sidebar-primary: 204 49% 22%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 100%;         /* white */
+    --sidebar-accent-foreground: 210 11% 15%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 204 49% 22%;
+
+    /* Progress chart colors */
+    --chart-primary: 204 49% 22%;       /* #1B3C53 */
+    --chart-secondary: 210 28% 40%;     /* #456882 */
+    --chart-success: 142 76% 36%;
+    --chart-warning: 38 92% 50%;
+    --chart-danger: 0 84% 60%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-inter;
+  }
+}
+
+@layer utilities {
+  /* OFSTED Status Indicators */
+  .status-compliant {
+    @apply bg-success text-success-foreground;
+  }
+  
+  .status-warning {
+    @apply bg-warning text-warning-foreground;
+  }
+  
+  .status-overdue {
+    @apply bg-destructive text-destructive-foreground;
+  }
+  
+  .status-pending {
+    @apply bg-muted text-muted-foreground;
+  }
+
+  /* Chart container styles */
+  .chart-container {
+    @apply relative w-full h-full;
+  }
+}
