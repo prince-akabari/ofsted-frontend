@@ -1,73 +1,93 @@
-# Welcome to your Lovable project
+# 🏠 OFSTED Prep – Compliance Management Platform
 
-## Project info
+A modern, role-based compliance platform built for care homes to prepare efficiently for OFSTED inspections. Designed to streamline audits, track staff training, manage policy documents, and surface critical alerts — all in one calm, intuitive dashboard.
 
-**URL**: https://lovable.dev/projects/381246ae-e8d8-4ade-aafe-2b06347a53b6
+---
 
-## How can I edit this code?
+## 🚀 Features
 
-There are several ways of editing your application.
+### 🧭 Dashboard Overview
+- Visual summary of audit completion, staff compliance, and outstanding tasks
+- Quick insights for managers to track inspection readiness
 
-**Use Lovable**
+### ✅ Audit Checklist
+- Preloaded with OFSTED-aligned criteria (Safeguarding, Leadership, etc.)
+- Mark items as complete, upload evidence, and add comments
+- Category-wise progress tracking
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/381246ae-e8d8-4ade-aafe-2b06347a53b6) and start prompting.
+### 👤 Staff Compliance Tracker
+- Upload and manage staff training, DBS checks, references, employment history
+- Automated reminders for expiring/expired documents
 
-Changes made via Lovable will be committed automatically to this repo.
+### 📂 Policies & Documents
+- Upload, categorize, and version policies with timestamps
+- Assign policies to staff for review/acknowledgment
 
-**Use your preferred IDE**
+### 🔔 Alerts & Notifications
+- Email + in-app reminders for upcoming or overdue actions
+- Admin overview of system-wide pending issues
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 📊 Reports & Logs
+- Auto-generate PDF/on-screen reports
+- Complete audit trail: staff activity, document versions, and compliance logs
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## 👥 User Roles & Permissions
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### 1. **Admin (Home Manager / Owner)**
+- Full access to all features and modules
+- Can add/edit staff, upload policies, assign checklists
+- Can generate reports and invite/remove users
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 2. **Staff**
+- Access to assigned checklists and policies
+- Can upload personal documents (e.g. certificates, ID)
+- Complete compliance tasks assigned to them
 
-# Step 3: Install the necessary dependencies.
-npm i
+### 3. **Read-Only User (Consultant / Senior Leader)**
+- View-only access across all modules
+- Cannot edit, upload, or assign tasks
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+---
 
-**Edit a file directly in GitHub**
+## 📑 Core Policy Categories
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### 🛡️ Safeguarding & Protection
+- Safeguarding & Child Protection, Whistleblowing, Prevent, Allegations, etc.
 
-**Use GitHub Codespaces**
+### 👩‍⚕️ Health & Wellbeing
+- Medication, Mental Health, First Aid, Infection Control, Self-Harm, etc.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### 🏡 Daily Living & Care
+- Care Planning, Complaints, EDI, Behaviour Management, Keyworking, etc.
 
-## What technologies are used for this project?
+### 👥 Staffing & HR
+- Safer Recruitment, Training & Development, GDPR Policy, Lone Working, etc.
 
-This project is built with:
+### 📚 Education & Activities
+- Learning Support, Community Engagement, Internet Use, etc.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### 🛑 Emergency & Risk
+- Fire Safety, Critical Incidents, Risk Assessments, etc.
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/381246ae-e8d8-4ade-aafe-2b06347a53b6) and click on Share -> Publish.
+## 📎 Other Essential Documents
+- Staff training certificates (Safeguarding, First Aid, Medication)
+- DBS checks, references, right-to-work
+- Supervision & Appraisal records
+- Health & Safety audits
+- Placement plans and risk assessments
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+## 🛠 Tech Stack
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- **Frontend**: React.js
+- **Backend**: Node.js + Express.js
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: Role-based access control
+- **Hosting**: AWS / Vercel / Aiven
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
