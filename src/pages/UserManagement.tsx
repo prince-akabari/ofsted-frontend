@@ -250,11 +250,30 @@ export default function UserManagement() {
               </TableHeader>
               <TableBody>
                 {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-6">
-                      Loading users...
-                    </TableCell>
-                  </TableRow>
+                  <>
+                    {[...Array(5)].map((_, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="py-4">
+                          <div className="h-6 w-24 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-6 w-32 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-6 w-20 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-6 w-20 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-6 w-24 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-6 w-10 bg-muted animate-pulse rounded" />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </>
                 ) : (
                   users.map((user) => (
                     <TableRow key={user.id}>

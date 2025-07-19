@@ -2,8 +2,21 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Download, Calendar, BarChart3, TrendingUp } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  FileText,
+  Download,
+  Calendar,
+  BarChart3,
+  TrendingUp,
+} from "lucide-react";
 import api from "@/services/apiService";
 
 interface Report {
@@ -27,12 +40,13 @@ const reportTypes = [
   "Audit Report",
   "Safeguarding Report",
   "Staff Report",
-  "Financial Report"
+  "Financial Report",
 ];
 
 export default function Reports() {
   const [selectedType, setSelectedType] = useState("All Reports");
   const [reportsData, setReportsData] = useState<Report[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -41,6 +55,8 @@ export default function Reports() {
         setReportsData(res.data);
       } catch (err) {
         console.error("Failed to fetch reports:", err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchReports();
@@ -70,23 +86,23 @@ export default function Reports() {
     {
       title: "OFSTED Readiness Report",
       description: "Complete overview of inspection readiness",
-      icon: <BarChart3 className="h-6 w-6 text-primary" />
+      icon: <BarChart3 className="h-6 w-6 text-primary" />,
     },
     {
       title: "Staff Compliance Summary",
       description: "Current status of all staff requirements",
-      icon: <FileText className="h-6 w-6 text-primary" />
+      icon: <FileText className="h-6 w-6 text-primary" />,
     },
     {
       title: "Audit Progress Report",
       description: "Detailed audit checklist completion status",
-      icon: <TrendingUp className="h-6 w-6 text-primary" />
+      icon: <TrendingUp className="h-6 w-6 text-primary" />,
     },
     {
       title: "Policy Compliance Report",
       description: "Status of all policies and acknowledgements",
-      icon: <FileText className="h-6 w-6 text-primary" />
-    }
+      icon: <FileText className="h-6 w-6 text-primary" />,
+    },
   ];
 
   return (
@@ -94,8 +110,12 @@ export default function Reports() {
       {/* Header */}
       <div className="border-b border-border bg-card">
         <div className="px-6 py-4">
-          <h1 className="text-2xl font-semibold text-foreground">Reports & Logs</h1>
-          <p className="text-muted-foreground">Generate and view inspection readiness reports</p>
+          <h1 className="text-2xl font-semibold text-foreground">
+            Reports & Logs
+          </h1>
+          <p className="text-muted-foreground">
+            Generate and view inspection readiness reports
+          </p>
         </div>
       </div>
 
@@ -106,16 +126,23 @@ export default function Reports() {
           <h2 className="text-lg font-semibold mb-4">Generate New Report</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {quickReports.map((report, index) => (
-              <Card key={index} className="p-4 hover:shadow-md transition-shadow cursor-pointer">
+              <Card
+                key={index}
+                className="p-4 hover:shadow-md transition-shadow cursor-pointer"
+              >
                 <div className="space-y-3">
                   <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg">
                     {report.icon}
                   </div>
                   <div>
                     <h3 className="font-medium text-sm">{report.title}</h3>
-                    <p className="text-xs text-muted-foreground">{report.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {report.description}
+                    </p>
                   </div>
-                  <Button size="sm" className="w-full">Generate</Button>
+                  <Button size="sm" className="w-full">
+                    Generate
+                  </Button>
                 </div>
               </Card>
             ))}
@@ -124,36 +151,40 @@ export default function Reports() {
 
         {/* Report Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="p-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-foreground">{reportsData.length}</div>
-              <div className="text-sm text-muted-foreground">Total Reports</div>
-            </div>
-          </Card>
-          <Card className="p-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-success">
-                {reportsData.filter((r) => r.status === 'complete').length}
-              </div>
-              <div className="text-sm text-muted-foreground">Completed</div>
-            </div>
-          </Card>
-          <Card className="p-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-warning">
-                {reportsData.filter((r) => r.status === 'in_progress' || r.status === 'in-progress').length}
-              </div>
-              <div className="text-sm text-muted-foreground">In Progress</div>
-            </div>
-          </Card>
-          <Card className="p-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">
-                {reportsData.filter((r) => r.status === 'scheduled').length}
-              </div>
-              <div className="text-sm text-muted-foreground">Scheduled</div>
-            </div>
-          </Card>
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="p-4">
+              {loading ? (
+                <Skeleton className="h-6 w-full" />
+              ) : (
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-foreground">
+                    {i === 0
+                      ? reportsData.length
+                      : i === 1
+                      ? reportsData.filter((r) => r.status === "complete")
+                          .length
+                      : i === 2
+                      ? reportsData.filter(
+                          (r) =>
+                            r.status === "in_progress" ||
+                            r.status === "in-progress"
+                        ).length
+                      : reportsData.filter((r) => r.status === "scheduled")
+                          .length}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {i === 0
+                      ? "Total Reports"
+                      : i === 1
+                      ? "Completed"
+                      : i === 2
+                      ? "In Progress"
+                      : "Scheduled"}
+                  </div>
+                </div>
+              )}
+            </Card>
+          ))}
         </div>
 
         {/* Report Filters and List */}
@@ -167,7 +198,9 @@ export default function Reports() {
                 </SelectTrigger>
                 <SelectContent>
                   {reportTypes.map((type) => (
-                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -177,35 +210,56 @@ export default function Reports() {
 
           {/* Reports List */}
           <div className="space-y-3">
-            {filteredReports.map((report) => (
-              <Card key={report.id} className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                      <FileText className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">{report.title}</h3>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        <span>{new Date(report.date).toLocaleDateString()}</span>
-                        <span>•</span>
-                        <span>{report.type}</span>
-                        <span>•</span>
-                        <span>{report.category}</span>
+            {loading
+              ? [...Array(3)].map((_, i) => (
+                  <Card key={i} className="p-4 space-y-2">
+                    <Skeleton className="h-4 w-1/2" />
+                    <Skeleton className="h-3 w-1/3" />
+                    <Skeleton className="h-8 w-full mt-2" />
+                  </Card>
+                ))
+              : filteredReports.map((report) => (
+                  <Card key={report.id} className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                          <FileText className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">{report.title}</h3>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Calendar className="h-4 w-4" />
+                            <span>
+                              {new Date(report.date).toLocaleDateString()}
+                            </span>
+                            <span>•</span>
+                            <span>{report.type}</span>
+                            <span>•</span>
+                            <span>{report.category}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Badge className={getStatusBadge(report.status)}>
+                          {report.status.toUpperCase()}
+                        </Badge>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex items-center gap-2"
+                          >
+                            <Download className="h-4 w-4" />
+                            Download
+                          </Button>
+                          <Button size="sm" variant="outline">
+                            View
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Badge className={getStatusBadge(report.status)}>{report.status.toUpperCase()}</Badge>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" className="flex items-center gap-2"><Download className="h-4 w-4" />Download</Button>
-                      <Button size="sm" variant="outline">View</Button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
+                  </Card>
+                ))}
           </div>
         </div>
 
@@ -215,36 +269,35 @@ export default function Reports() {
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Static scheduled items retained */}
-              <Card className="p-4 bg-muted/30">
-                <div className="space-y-2">
-                  <h3 className="font-medium">Weekly Compliance Summary</h3>
-                  <p className="text-sm text-muted-foreground">Every Monday at 9:00 AM</p>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline">Edit</Button>
-                    <Button size="sm" variant="ghost">Disable</Button>
+              {["Weekly", "Monthly", "Quarterly"].map((label, idx) => (
+                <Card key={idx} className="p-4 bg-muted/30">
+                  <div className="space-y-2">
+                    <h3 className="font-medium">
+                      {label}{" "}
+                      {idx === 0
+                        ? "Compliance Summary"
+                        : idx === 1
+                        ? "Audit Progress"
+                        : "OFSTED Readiness"}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {idx === 0
+                        ? "Every Monday at 9:00 AM"
+                        : idx === 1
+                        ? "First day of each month"
+                        : "Every 3 months"}
+                    </p>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline">
+                        Edit
+                      </Button>
+                      <Button size="sm" variant="ghost">
+                        Disable
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </Card>
-              <Card className="p-4 bg-muted/30">
-                <div className="space-y-2">
-                  <h3 className="font-medium">Monthly Audit Progress</h3>
-                  <p className="text-sm text-muted-foreground">First day of each month</p>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline">Edit</Button>
-                    <Button size="sm" variant="ghost">Disable</Button>
-                  </div>
-                </div>
-              </Card>
-              <Card className="p-4 bg-muted/30">
-                <div className="space-y-2">
-                  <h3 className="font-medium">Quarterly OFSTED Readiness</h3>
-                  <p className="text-sm text-muted-foreground">Every 3 months</p>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline">Edit</Button>
-                    <Button size="sm" variant="ghost">Disable</Button>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              ))}
             </div>
             <div className="pt-4 border-t border-border">
               <Button>Add Scheduled Report</Button>

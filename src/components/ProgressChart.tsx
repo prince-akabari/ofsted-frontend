@@ -34,7 +34,7 @@ export function ProgressChart({
     datasets: [
       {
         data: [percentage, 100 - percentage],
-        backgroundColor: ["#1f4f86", "#e5e7eb"], // dark blue & gray
+        backgroundColor: ["#1d3e54", "#e5e7eb"], // dark blue & gray
         borderWidth: 0,
         cutout: "70%",
         circumference: 360,
@@ -54,7 +54,7 @@ export function ProgressChart({
   };
 
   return (
-    <Card className="p-6 rounded-lg border border-gray-200 shadow-sm text-center">
+    <Card className="p-6 rounded-lg border border-gray-200 shadow-lg text-center">
       <div
         className="relative mx-auto"
         style={{ width: sizePx, height: sizePx }}

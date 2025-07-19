@@ -21,10 +21,10 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import api from "@/services/apiService";
 import toast from "react-hot-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function StaffCompliance() {
   const [staff, setStaff] = useState<any[]>([]);
@@ -178,9 +178,9 @@ export default function StaffCompliance() {
 
       <div className="p-6 space-y-6">
         {/* Overview Stats */}
-        {summary && (
+        {summary ? (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card className="p-4">
+            <Card className="p-4 w-full h-24">
               <div className="text-center">
                 <div className="text-2xl font-bold text-primary">
                   {summary.overallCompliance}%
@@ -190,7 +190,7 @@ export default function StaffCompliance() {
                 </div>
               </div>
             </Card>
-            <Card className="p-4">
+            <Card className="p-4 w-full h-24">
               <div className="text-center">
                 <div className="text-2xl font-bold text-success">
                   {summary.fullyCompliant}
@@ -200,7 +200,7 @@ export default function StaffCompliance() {
                 </div>
               </div>
             </Card>
-            <Card className="p-4">
+            <Card className="p-4 w-full h-24">
               <div className="text-center">
                 <div className="text-2xl font-bold text-warning">
                   {summary.attentionNeeded}
@@ -210,7 +210,7 @@ export default function StaffCompliance() {
                 </div>
               </div>
             </Card>
-            <Card className="p-4">
+            <Card className="p-4 w-full h-24">
               <div className="text-center">
                 <div className="text-2xl font-bold text-destructive">
                   {summary.overdue}
@@ -221,6 +221,19 @@ export default function StaffCompliance() {
               </div>
             </Card>
           </div>
+        ) : (
+          // Radix UI Skeletons
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <Card
+                key={i}
+                className="p-4 w-full h-24 flex items-center justify-center"
+              >
+                <Skeleton className="w-24 h-6 mb-2" />
+                <Skeleton className="w-32 h-4" />
+              </Card>
+            ))}
+          </div>
         )}
 
         <div className="space-y-4">
@@ -230,114 +243,143 @@ export default function StaffCompliance() {
               <Plus className="h-4 w-4 mr-2" /> Add New Staff
             </Button>
           </div>
-
-          {!loading &&
-            staff.map((s) => (
-              <Card key={s.id} className="p-6">
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-4">
-                      <Avatar className="h-12 w-12">
-                        <AvatarFallback className="bg-primary text-primary-foreground">
-                          {s.name
-                            .split(" ")
-                            .map((n: string) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-semibold text-lg">{s.name}</h3>
-                        <p className="text-muted-foreground">{s.role}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {s.email}
-                        </p>
+          {loading
+            ? Array.from({ length: 3 }).map((_, idx) => (
+                <Card key={idx} className="p-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Skeleton className="h-12 w-12 rounded-full" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-40" />
+                        <Skeleton className="h-3 w-28" />
+                        <Skeleton className="h-3 w-36" />
                       </div>
                     </div>
                     <div className="text-right space-y-2">
-                      <Badge className={getStatusBadge(s.status)}>
-                        {s.status.toUpperCase()}
-                      </Badge>
-                      <div className="text-sm text-muted-foreground">
-                        Compliance: {calculateComplianceScore(s)}%
-                      </div>
-                      <Progress
-                        value={calculateComplianceScore(s)}
-                        className="w-24"
-                      />
+                      <Skeleton className="h-6 w-20" />
+                      <Skeleton className="h-3 w-20" />
+                      <Skeleton className="h-2 w-24" />
                     </div>
                   </div>
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Card className="p-4 bg-muted/30">
-                      <div className="flex items-center justify-between">
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                  </div>
+                  <div className="flex gap-2">
+                    <Skeleton className="h-10 w-24 rounded-md" />
+                    <Skeleton className="h-10 w-24 rounded-md" />
+                    <Skeleton className="h-10 w-12 rounded-md" />
+                  </div>
+                </Card>
+              ))
+            : staff.map((s) => (
+                <Card key={s.id} className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center space-x-4">
+                        <Avatar className="h-12 w-12">
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                            {s.name
+                              .split(" ")
+                              .map((n: string) => n[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
                         <div>
-                          <h4 className="font-medium">DBS Check</h4>
-                          <p
-                            className={`text-sm ${getDbsStatusColor(
-                              s.dbsCheckStatus
-                            )}`}
-                          >
-                            {s.dbsCheckStatus.toUpperCase()}
+                          <h3 className="font-semibold text-lg">{s.name}</h3>
+                          <p className="text-muted-foreground">{s.role}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {s.email}
                           </p>
                         </div>
-                        <div className="text-right">
-                          <div className="flex items-center text-sm text-muted-foreground">
-                            <Calendar className="h-4 w-4 mr-1" />
-                            {new Date(s.dbsExpiryDate).toLocaleDateString()}
-                          </div>
-                        </div>
                       </div>
-                    </Card>
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Training Status</h4>
+                      <div className="text-right space-y-2">
+                        <Badge className={getStatusBadge(s.status)}>
+                          {s.status.toUpperCase()}
+                        </Badge>
+                        <div className="text-sm text-muted-foreground">
+                          Compliance: {calculateComplianceScore(s)}%
+                        </div>
+                        <Progress
+                          value={calculateComplianceScore(s)}
+                          className="w-24"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Card className="p-4 bg-muted/30">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-medium">DBS Check</h4>
+                            <p
+                              className={`text-sm ${getDbsStatusColor(
+                                s.dbsCheckStatus
+                              )}`}
+                            >
+                              {s.dbsCheckStatus.toUpperCase()}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <Calendar className="h-4 w-4 mr-1" />
+                              {new Date(s.dbsExpiryDate).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
                       <div className="space-y-2">
-                        <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
-                          <div className="flex items-center gap-2">
-                            {getTrainingStatusIcon(
-                              s.trainingSafeguardingStatus
-                            )}
-                            <span className="text-sm">Safeguarding</span>
+                        <h4 className="font-medium">Training Status</h4>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                            <div className="flex items-center gap-2">
+                              {getTrainingStatusIcon(
+                                s.trainingSafeguardingStatus
+                              )}
+                              <span className="text-sm">Safeguarding</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(
+                                s.trainingSafeguardingDate
+                              ).toLocaleDateString()}
+                            </span>
                           </div>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(
-                              s.trainingSafeguardingDate
-                            ).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
-                          <div className="flex items-center gap-2">
-                            {getTrainingStatusIcon(s.trainingFirstAidStatus)}
-                            <span className="text-sm">First Aid</span>
+                          <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                            <div className="flex items-center gap-2">
+                              {getTrainingStatusIcon(s.trainingFirstAidStatus)}
+                              <span className="text-sm">First Aid</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(
+                                s.trainingFirstAidDate
+                              ).toLocaleDateString()}
+                            </span>
                           </div>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(
-                              s.trainingFirstAidDate
-                            ).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
-                          <div className="flex items-center gap-2">
-                            {getTrainingStatusIcon(s.trainingMedicationStatus)}
-                            <span className="text-sm">Medication</span>
+                          <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                            <div className="flex items-center gap-2">
+                              {getTrainingStatusIcon(
+                                s.trainingMedicationStatus
+                              )}
+                              <span className="text-sm">Medication</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(
+                                s.trainingMedicationDate
+                              ).toLocaleDateString()}
+                            </span>
                           </div>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(
-                              s.trainingMedicationDate
-                            ).toLocaleDateString()}
-                          </span>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex gap-2 pt-2 border-t border-border">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleViewDetails(s)}
-                    >
-                      View Details
-                    </Button>
-                    {/* <Button
+                    <div className="flex gap-2 pt-2 border-t border-border">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleViewDetails(s)}
+                      >
+                        View Details
+                      </Button>
+                      {/* <Button
                       size="sm"
                       variant="outline"
                       onClick={() => handleUploadDocs(s)}
@@ -347,27 +389,27 @@ export default function StaffCompliance() {
                     <Button size="sm" variant="outline">
                       Send Reminder
                     </Button> */}
-                    {s.status !== "compliant" && (
+                      {s.status !== "compliant" && (
+                        <Button
+                          size="sm"
+                          variant="default"
+                          onClick={() => handleUpdateStatus(s)}
+                        >
+                          Update Status
+                        </Button>
+                      )}
                       <Button
                         size="sm"
-                        variant="default"
-                        onClick={() => handleUpdateStatus(s)}
+                        variant="outline"
+                        onClick={() => setDeleteTarget(s)}
+                        disabled={buttonLoading}
                       >
-                        Update Status
+                        <Trash2 className="w-4 h-4" />
                       </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setDeleteTarget(s)}
-                      disabled={buttonLoading}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              ))}
         </div>
       </div>
 

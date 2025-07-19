@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { User, Lock, FileText, Shield } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "@/services/apiService";
@@ -16,14 +17,14 @@ export default function Profile() {
     email: "",
     role: "",
     joinDate: "",
-    lastLogin: ""
+    lastLogin: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
 
   const userId = JSON.parse(localStorage.getItem("user") || "{}").id;
@@ -50,12 +51,12 @@ export default function Profile() {
       api.put(`/profile/${userId}`, {
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
       }),
       {
         loading: "Updating profile...",
         success: "Profile updated successfully",
-        error: (err) => err?.response?.data?.error || "Update failed"
+        error: (err) => err?.response?.data?.error || "Update failed",
       }
     );
   };
@@ -67,16 +68,19 @@ export default function Profile() {
       return;
     }
 
-    toast.promise(
-      api.put(`/profile/change-password/${userId}`, passwordData),
-      {
+    toast
+      .promise(api.put(`/profile/change-password/${userId}`, passwordData), {
         loading: "Changing password...",
         success: "Password changed successfully",
-        error: (err) => err?.response?.data?.error || "Password change failed"
-      }
-    ).then(() => {
-      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
-    });
+        error: (err) => err?.response?.data?.error || "Password change failed",
+      })
+      .then(() => {
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      });
   };
 
   const userDocuments = [
@@ -90,14 +94,14 @@ export default function Profile() {
     const variants = {
       admin: "bg-primary text-primary-foreground",
       staff: "bg-secondary text-secondary-foreground",
-      readonly: "bg-muted text-muted-foreground"
+      readonly: "bg-muted text-muted-foreground",
     };
     return variants[role as keyof typeof variants] || variants.staff;
   };
 
   const getStatusBadge = (status: string) => {
-    return status === "valid" 
-      ? "bg-success text-success-foreground" 
+    return status === "valid"
+      ? "bg-success text-success-foreground"
       : "bg-destructive text-destructive-foreground";
   };
 
@@ -106,42 +110,73 @@ export default function Profile() {
       <div className="border-b border-border bg-card">
         <div className="px-6 py-4">
           <h1 className="text-2xl font-semibold text-foreground">Profile</h1>
-          <p className="text-muted-foreground">Manage your account settings and information</p>
+          <p className="text-muted-foreground">
+            Manage your account settings and information
+          </p>
         </div>
       </div>
 
       <div className="p-6 max-w-4xl mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Profile Card */}
           <Card className="lg:col-span-1">
             <CardHeader className="text-center">
-              <Avatar className="w-24 h-24 mx-auto mb-4">
-                <AvatarFallback className="text-2xl font-bold">
-                  {user.name.split(' ').map(n => n[0]).join('')}
-                </AvatarFallback>
-              </Avatar>
-              <CardTitle>{user.name}</CardTitle>
-              <div className="flex justify-center">
-                <Badge className={`${getRoleBadge(user.role)} text-center min-w-[80px]`}>
-                  {user.role.toUpperCase()}
-                </Badge>
-              </div>
+              {loading ? (
+                <>
+                  <Skeleton className="w-24 h-24 rounded-full mx-auto mb-4" />
+                  <Skeleton className="h-5 w-32 mx-auto mb-2" />
+                  <Skeleton className="h-4 w-20 mx-auto" />
+                </>
+              ) : (
+                <>
+                  <Avatar className="w-24 h-24 mx-auto mb-4">
+                    <AvatarFallback className="text-2xl font-bold">
+                      {user.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <CardTitle>{user.name}</CardTitle>
+                  <div className="flex justify-center">
+                    <Badge
+                      className={`${getRoleBadge(
+                        user.role
+                      )} text-center max-w-[86px]`}
+                    >
+                      {user.role.toUpperCase()}
+                    </Badge>
+                  </div>
+                </>
+              )}
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <User className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">{user.email}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Shield className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">Joined {user.joinDate}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Lock className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">Last login {user.lastLogin}</span>
-              </div>
+              {loading ? (
+                <>
+                  <Skeleton className="h-4 w-40 mx-auto" />
+                  <Skeleton className="h-4 w-48 mx-auto" />
+                  <Skeleton className="h-4 w-44 mx-auto" />
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center space-x-2">
+                    <User className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm">{user.email}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Shield className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm">Joined {user.joinDate}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Lock className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm">Last login {user.lastLogin}</span>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
+          {/* Tabs Area */}
           <div className="lg:col-span-2">
             <Tabs defaultValue="profile" className="space-y-4">
               <TabsList>
@@ -156,28 +191,44 @@ export default function Profile() {
                     <CardTitle>Profile Information</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <form onSubmit={handleProfileUpdate} className="space-y-4">
+                    {loading ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="name">Full Name</Label>
-                          <Input
-                            id="name"
-                            value={user.name}
-                            onChange={(e) => setUser({ ...user, name: e.target.value })}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="email">Email</Label>
-                          <Input
-                            id="email"
-                            type="email"
-                            value={user.email}
-                            onChange={(e) => setUser({ ...user, email: e.target.value })}
-                          />
-                        </div>
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
                       </div>
-                      <Button type="submit" disabled={loading}>Update Profile</Button>
-                    </form>
+                    ) : (
+                      <form
+                        onSubmit={handleProfileUpdate}
+                        className="space-y-4"
+                      >
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="name">Full Name</Label>
+                            <Input
+                              id="name"
+                              value={user.name}
+                              onChange={(e) =>
+                                setUser({ ...user, name: e.target.value })
+                              }
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="email">Email</Label>
+                            <Input
+                              id="email"
+                              type="email"
+                              value={user.email}
+                              onChange={(e) =>
+                                setUser({ ...user, email: e.target.value })
+                              }
+                            />
+                          </div>
+                        </div>
+                        <Button type="submit" disabled={loading}>
+                          Update Profile
+                        </Button>
+                      </form>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -188,36 +239,68 @@ export default function Profile() {
                     <CardTitle>Change Password</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <form onSubmit={handlePasswordChange} className="space-y-4">
-                      <div>
-                        <Label htmlFor="currentPassword">Current Password</Label>
-                        <Input
-                          id="currentPassword"
-                          type="password"
-                          value={passwordData.currentPassword}
-                          onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                        />
+                    {loading ? (
+                      <div className="space-y-4">
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
                       </div>
-                      <div>
-                        <Label htmlFor="newPassword">New Password</Label>
-                        <Input
-                          id="newPassword"
-                          type="password"
-                          value={passwordData.newPassword}
-                          onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                        <Input
-                          id="confirmPassword"
-                          type="password"
-                          value={passwordData.confirmPassword}
-                          onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                        />
-                      </div>
-                      <Button type="submit" disabled={loading}>Change Password</Button>
-                    </form>
+                    ) : (
+                      <form
+                        onSubmit={handlePasswordChange}
+                        className="space-y-4"
+                      >
+                        <div>
+                          <Label htmlFor="currentPassword">
+                            Current Password
+                          </Label>
+                          <Input
+                            id="currentPassword"
+                            type="password"
+                            value={passwordData.currentPassword}
+                            onChange={(e) =>
+                              setPasswordData({
+                                ...passwordData,
+                                currentPassword: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="newPassword">New Password</Label>
+                          <Input
+                            id="newPassword"
+                            type="password"
+                            value={passwordData.newPassword}
+                            onChange={(e) =>
+                              setPasswordData({
+                                ...passwordData,
+                                newPassword: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="confirmPassword">
+                            Confirm New Password
+                          </Label>
+                          <Input
+                            id="confirmPassword"
+                            type="password"
+                            value={passwordData.confirmPassword}
+                            onChange={(e) =>
+                              setPasswordData({
+                                ...passwordData,
+                                confirmPassword: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <Button type="submit" disabled={loading}>
+                          Change Password
+                        </Button>
+                      </form>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -228,22 +311,38 @@ export default function Profile() {
                     <CardTitle>My Documents</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {userDocuments.map((doc, index) => (
-                        <div key={index} className="flex items-center justify-between p-4 border border-border rounded-lg">
-                          <div className="flex items-center space-x-3">
-                            <FileText className="w-5 h-5 text-muted-foreground" />
-                            <div>
-                              <p className="font-medium">{doc.name}</p>
-                              <p className="text-sm text-muted-foreground">Expires: {doc.expiry}</p>
+                    {loading ? (
+                      <div className="space-y-4">
+                        {[...Array(3)].map((_, i) => (
+                          <Skeleton
+                            key={i}
+                            className="h-16 w-full rounded-lg"
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {userDocuments.map((doc, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between p-4 border border-border rounded-lg"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <FileText className="w-5 h-5 text-muted-foreground" />
+                              <div>
+                                <p className="font-medium">{doc.name}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  Expires: {doc.expiry}
+                                </p>
+                              </div>
                             </div>
+                            <Badge className={getStatusBadge(doc.status)}>
+                              {doc.status.toUpperCase()}
+                            </Badge>
                           </div>
-                          <Badge className={getStatusBadge(doc.status)}>
-                            {doc.status.toUpperCase()}
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
