@@ -7,27 +7,34 @@ import { CheckCircle, Clock, AlertCircle, Circle } from "lucide-react";
 import { type AuditItem } from "@/data/dummyData";
 import { Skeleton } from "@/components/ui/skeleton";
 import api from "@/services/apiService";
+import { AddAuditChecklistModal } from "@/components/modals/AddAuditChecklistModal";
+import { hasRole } from "@/lib/utils";
+import { EditAuditChecklistModal } from "@/components/modals/EditAuditChecklistModal";
 
 export default function AuditChecklist() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [auditChecklistData, setAuditChecklistData] = useState<AuditItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [openChecklistModal, setOpenChecklistModal] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedChecklistId, setSelectedChecklistId] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
-    const fetchAuditChecklist = async () => {
-      try {
-        const res = await api.get("/audit-checklist");
-        setAuditChecklistData(res.data.auditChecklist);
-      } catch (err) {
-        console.error("Failed to fetch audit checklist:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchAuditChecklist();
   }, []);
 
+  const fetchAuditChecklist = async () => {
+    try {
+      const res = await api.get("/audit-checklist");
+      setAuditChecklistData(res.data.auditChecklist);
+    } catch (err) {
+      console.error("Failed to fetch audit checklist:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
   const categories = [
     "all",
     ...new Set(auditChecklistData.map((item) => item.category)),
@@ -95,16 +102,22 @@ export default function AuditChecklist() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="border-b border-border bg-card">
-        <div className="px-6 py-4">
-          <h1 className="text-2xl font-semibold text-foreground">
-            Audit Checklist
-          </h1>
-          <p className="text-muted-foreground">
-            OFSTED-aligned criteria and compliance tracking
-          </p>
+        <div className="px-6 py-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">
+              Audit Checklist
+            </h1>
+            <p className="text-muted-foreground">
+              OFSTED-aligned criteria and compliance tracking
+            </p>
+          </div>
+          {hasRole(["admin"]) && (
+            <Button onClick={() => setOpenChecklistModal(true)}>
+              Add Audit Checklist
+            </Button>
+          )}
         </div>
       </div>
-
       {/* Main Content */}
       <div className="p-6">
         {loading ? (
@@ -120,7 +133,7 @@ export default function AuditChecklist() {
             onValueChange={setSelectedCategory}
             className="space-y-6"
           >
-            <TabsList className="grid w-full grid-cols-7 h-auto">
+            <TabsList className="grid w-full grid-cols-6 h-auto">
               {categories.map((category) => {
                 const stats = getCategoryStats(category);
                 return (
@@ -168,7 +181,9 @@ export default function AuditChecklist() {
                           <div
                             className="bg-primary h-2 rounded-full transition-all duration-300"
                             style={{
-                              width: `${getCategoryStats(category).percentage}%`,
+                              width: `${
+                                getCategoryStats(category).percentage
+                              }%`,
                             }}
                           ></div>
                         </div>
@@ -181,7 +196,9 @@ export default function AuditChecklist() {
                     {filteredItems.map((item) => (
                       <Card key={item.id} className="p-4">
                         <div className="flex items-start space-x-4">
-                          <div className="mt-1">{getStatusIcon(item.status)}</div>
+                          <div className="mt-1">
+                            {getStatusIcon(item.status)}
+                          </div>
                           <div className="flex-1 space-y-2">
                             <div className="flex items-start justify-between">
                               <div>
@@ -213,7 +230,8 @@ export default function AuditChecklist() {
 
                             {item.assignedTo && (
                               <p className="text-sm text-muted-foreground">
-                                Assigned to: {item.assignedTo ? item.assignedTo?.name : '-'}
+                                Assigned to:{" "}
+                                {item.assignedTo ? item.assignedTo?.name : "-"}
                               </p>
                             )}
 
@@ -235,7 +253,14 @@ export default function AuditChecklist() {
                             )}
 
                             <div className="flex gap-2">
-                              <Button size="sm" variant="outline">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setSelectedChecklistId(item.id);
+                                  setEditModalOpen(true);
+                                }}
+                              >
                                 Edit
                               </Button>
                               <Button size="sm" variant="outline">
@@ -258,6 +283,22 @@ export default function AuditChecklist() {
           </Tabs>
         )}
       </div>
+      <AddAuditChecklistModal
+        open={openChecklistModal}
+        onOpenChange={setOpenChecklistModal}
+        onChecklistAdded={() => fetchAuditChecklist()}
+      />
+      {selectedChecklistId && (
+        <EditAuditChecklistModal
+          open={editModalOpen}
+          onOpenChange={setEditModalOpen}
+          checklistId={selectedChecklistId}
+          onChecklistUpdated={() => {
+            setEditModalOpen(false);
+            fetchAuditChecklist();
+          }}
+        />
+      )}
     </div>
   );
 }

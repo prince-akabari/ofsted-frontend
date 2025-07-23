@@ -88,23 +88,48 @@ export default function Reports() {
       title: "OFSTED Readiness Report",
       description: "Complete overview of inspection readiness",
       icon: <BarChart3 className="h-6 w-6 text-primary" />,
+      type: 'ofsted'
     },
     {
       title: "Staff Compliance Summary",
       description: "Current status of all staff requirements",
       icon: <FileText className="h-6 w-6 text-primary" />,
+      type: 'Staff'
+
     },
     {
       title: "Audit Progress Report",
       description: "Detailed audit checklist completion status",
       icon: <TrendingUp className="h-6 w-6 text-primary" />,
+      type: 'audit'
+
     },
     {
       title: "Policy Compliance Report",
       description: "Status of all policies and acknowledgements",
       icon: <FileText className="h-6 w-6 text-primary" />,
+      type: 'policy'
+
     },
   ];
+  const handleGenerateReport = async (report: any) => {
+    try {
+      const payload = {
+        title: report.title,
+        type: report.type,
+        category: report.category,
+        status: report.status,
+        date: new Date().toISOString(),
+      };
+
+      await api.post("/reports", payload);
+      // Refetch reports or append new report to state
+      const updatedReports = await api.get("/reports");
+      setReportsData(updatedReports.data);
+    } catch (error) {
+      console.error("Report generation failed", error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -142,7 +167,7 @@ export default function Reports() {
                         {report.description}
                       </p>
                     </div>
-                    <Button size="sm" className="w-full">
+                    <Button size="sm" className="w-full" onClick={() => handleGenerateReport(report)}>
                       Generate
                     </Button>
                   </div>
