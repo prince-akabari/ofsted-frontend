@@ -14,6 +14,7 @@ import { FileText, Upload, Download, Users, Calendar } from "lucide-react";
 import { UploadPolicyModal } from "@/components/modals/UploadPolicyModal";
 import api from "@/services/apiService";
 import { Skeleton } from "@/components/ui/skeleton";
+import { hasRole } from "@/lib/utils";
 
 const policyCategories = [
   "All Categories",
@@ -30,17 +31,19 @@ export default function Policies() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [uploadPolicyOpen, setUploadPolicyOpen] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   // Load policies on mount
   useEffect(() => {
     fetchPolicy();
   }, []);
 
   const fetchPolicy = async () => {
-    api
+    setLoading(true);
+    await api
       .get("/policy")
       .then((res) => setPolicies(res.data.policies))
       .catch((err) => console.error("Failed to fetch policies:", err));
+    setLoading(false);
   };
 
   const filteredPolicies = policies.filter((policy) => {
@@ -121,18 +124,20 @@ export default function Policies() {
               </SelectContent>
             </Select>
           </div>
-          <Button
-            className="flex items-center gap-2"
-            onClick={() => setUploadPolicyOpen(true)}
-          >
-            <Upload className="h-4 w-4" />
-            Upload Policy
-          </Button>
+          {hasRole(["admin"]) && (
+            <Button
+              className="flex items-center gap-2"
+              onClick={() => setUploadPolicyOpen(true)}
+            >
+              <Upload className="h-4 w-4" />
+              Upload Policy
+            </Button>
+          )}
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {policies.length > 0 ? (
+          {!loading ? (
             <>
               <Card className="p-4 h-[120px] text-center">
                 <div className="text-2xl font-bold text-foreground">
@@ -175,7 +180,7 @@ export default function Policies() {
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Policy Documents</h2>
 
-          {policies.length === 0 ? (
+          {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4">
               {[...Array(3)].map((_, i) => (
                 <Card
@@ -271,48 +276,50 @@ export default function Policies() {
         </div>
 
         {/* OFSTED Checklist */}
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">
-            Essential OFSTED Policies Checklist
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              "Safeguarding and Child Protection Policy",
-              "Behavior Management & Physical Intervention Policy",
-              "Safer Recruitment Policy",
-              "Whistleblowing Policy",
-              "Medication Administration Policy",
-              "First Aid Policy",
-              "Care Planning Policy",
-              "Staff Supervision and Appraisal Policy",
-              "Emergency Evacuation and Fire Safety Policy",
-              "Risk Assessment Policy",
-              "Complaints Procedure",
-              "Confidentiality & Data Protection Policy",
-            ].map((policyName) => {
-              const exists = policies.some((p) => p.title === policyName);
-              return (
-                <div
-                  key={policyName}
-                  className="flex items-center gap-2 p-2 border border-border rounded"
-                >
+        {hasRole(["staff"]) && (
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold mb-4">
+              Essential OFSTED Policies Checklist
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[
+                "Safeguarding and Child Protection Policy",
+                "Behavior Management & Physical Intervention Policy",
+                "Safer Recruitment Policy",
+                "Whistleblowing Policy",
+                "Medication Administration Policy",
+                "First Aid Policy",
+                "Care Planning Policy",
+                "Staff Supervision and Appraisal Policy",
+                "Emergency Evacuation and Fire Safety Policy",
+                "Risk Assessment Policy",
+                "Complaints Procedure",
+                "Confidentiality & Data Protection Policy",
+              ].map((policyName) => {
+                const exists = policies.some((p) => p.title === policyName);
+                return (
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      exists ? "bg-success" : "bg-destructive"
-                    }`}
-                  ></div>
-                  <span
-                    className={`text-sm ${
-                      exists ? "text-foreground" : "text-muted-foreground"
-                    }`}
+                    key={policyName}
+                    className="flex items-center gap-2 p-2 border border-border rounded"
                   >
-                    {policyName}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        exists ? "bg-success" : "bg-destructive"
+                      }`}
+                    ></div>
+                    <span
+                      className={`text-sm ${
+                        exists ? "text-foreground" : "text-muted-foreground"
+                      }`}
+                    >
+                      {policyName}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        )}
       </div>
 
       <UploadPolicyModal

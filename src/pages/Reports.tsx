@@ -18,6 +18,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import api from "@/services/apiService";
+import { hasRole } from "@/lib/utils";
 
 interface Report {
   id: string;
@@ -122,33 +123,34 @@ export default function Reports() {
       {/* Main Content */}
       <div className="p-6 space-y-6">
         {/* Quick Report Generation */}
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Generate New Report</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {quickReports.map((report, index) => (
-              <Card
-                key={index}
-                className="p-4 hover:shadow-md transition-shadow cursor-pointer"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg">
-                    {report.icon}
+        {hasRole(["admin"]) && (
+          <>
+            <h2 className="text-lg font-semibold mb-4">Generate New Report</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {quickReports.map((report, index) => (
+                <Card
+                  key={index}
+                  className="p-4 hover:shadow-md transition-shadow cursor-pointer"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg">
+                      {report.icon}
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-sm">{report.title}</h3>
+                      <p className="text-xs text-muted-foreground h-8">
+                        {report.description}
+                      </p>
+                    </div>
+                    <Button size="sm" className="w-full">
+                      Generate
+                    </Button>
                   </div>
-                  <div>
-                    <h3 className="font-medium text-sm">{report.title}</h3>
-                    <p className="text-xs text-muted-foreground">
-                      {report.description}
-                    </p>
-                  </div>
-                  <Button size="sm" className="w-full">
-                    Generate
-                  </Button>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </Card>
-
+                </Card>
+              ))}
+            </div>
+          </>
+        )}
         {/* Report Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
@@ -264,11 +266,10 @@ export default function Reports() {
         </div>
 
         {/* Scheduled Reports */}
-        <Card className="p-6">
+        {/* <Card className="p-6">
           <h2 className="text-lg font-semibold mb-4">Scheduled Reports</h2>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Static scheduled items retained */}
               {["Weekly", "Monthly", "Quarterly"].map((label, idx) => (
                 <Card key={idx} className="p-4 bg-muted/30">
                   <div className="space-y-2">
@@ -303,7 +304,7 @@ export default function Reports() {
               <Button>Add Scheduled Report</Button>
             </div>
           </div>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );

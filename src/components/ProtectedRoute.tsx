@@ -3,20 +3,21 @@ import { Navigate } from "react-router-dom";
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  requiredRole?: "admin" | "staff" | "readonly";
+  allowedRoles?: Array<"admin" | "staff" | "readonly">;
 }
 
-export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
+
+export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const token = localStorage.getItem("token");
   const userStr = localStorage.getItem("user");
-  
+
   if (!token || !userStr) {
     return <Navigate to="/login" replace />;
   }
 
   const user = JSON.parse(userStr);
-  
-  if (requiredRole && user.role !== requiredRole && user.role !== "admin") {
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/" replace />;
   }
 

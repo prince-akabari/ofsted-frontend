@@ -213,7 +213,7 @@ export default function AuditChecklist() {
 
                             {item.assignedTo && (
                               <p className="text-sm text-muted-foreground">
-                                Assigned to: {item.assignedTo}
+                                Assigned to: {item.assignedTo ? item.assignedTo?.name : '-'}
                               </p>
                             )}
 

@@ -25,6 +25,7 @@ import {
 import api from "@/services/apiService";
 import toast from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { hasRole } from "@/lib/utils";
 
 export default function StaffCompliance() {
   const [staff, setStaff] = useState<any[]>([]);
@@ -239,9 +240,9 @@ export default function StaffCompliance() {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold">Staff Members</h2>
-            <Button onClick={() => setAddStaffOpen(true)}>
+            {/* <Button onClick={() => setAddStaffOpen(true)}>
               <Plus className="h-4 w-4 mr-2" /> Add New Staff
-            </Button>
+            </Button> */}
           </div>
           {loading
             ? Array.from({ length: 3 }).map((_, idx) => (
@@ -389,23 +390,25 @@ export default function StaffCompliance() {
                     <Button size="sm" variant="outline">
                       Send Reminder
                     </Button> */}
-                      {s.status !== "compliant" && (
-                        <Button
-                          size="sm"
-                          variant="default"
-                          onClick={() => handleUpdateStatus(s)}
-                        >
-                          Update Status
-                        </Button>
-                      )}
-                      <Button
+
+                      {s.status !== "compliant" &&
+                        hasRole(["staff", "admin"]) && (
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={() => handleUpdateStatus(s)}
+                          >
+                            Update Status
+                          </Button>
+                        )}
+                      {/* <Button
                         size="sm"
                         variant="outline"
                         onClick={() => setDeleteTarget(s)}
                         disabled={buttonLoading}
                       >
                         <Trash2 className="w-4 h-4" />
-                      </Button>
+                      </Button> */}
                     </div>
                   </div>
                 </Card>

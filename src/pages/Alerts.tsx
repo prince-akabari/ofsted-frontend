@@ -206,7 +206,9 @@ export default function Alerts() {
               ))}
             </div>
           ) : (
-            <></>
+            regularAlerts.length === 0 && (
+              <div className="text-center py-40">No Notifications</div>
+            )
           )}
           {!loading &&
             regularAlerts.map((alert) => (
@@ -248,7 +250,7 @@ export default function Alerts() {
         </div>
 
         {/* Alert Settings */}
-        <Card className="p-6">
+        {/* <Card className="p-6">
           <h2 className="text-lg font-semibold mb-4">Alert Settings</h2>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -318,7 +320,7 @@ export default function Alerts() {
               <Button>Save Settings</Button>
             </div>
           </div>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );
