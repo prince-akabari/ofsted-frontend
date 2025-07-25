@@ -19,9 +19,55 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Upload, FileText, Users, Calendar, AlertCircle } from "lucide-react";
+import { Upload, FileText, Users, AlertCircle } from "lucide-react";
 import { toast } from "react-hot-toast";
 import api from "@/services/apiService";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+
+function DatePicker({
+  date,
+  onDateChange,
+  placeholder,
+}: {
+  date: Date | null;
+  onDateChange: (date: Date | null) => void;
+  placeholder: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className={`w-full justify-start text-left font-normal ${
+            !date && "text-muted-foreground"
+          }`}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {date ? format(date, "PPP") : placeholder}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          mode="single"
+          selected={date || undefined}
+          onSelect={(selectedDate) => {
+            onDateChange(selectedDate);
+            setOpen(false);
+          }}
+          initialFocus
+        />
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 interface UploadPolicyModalProps {
   open: boolean;
@@ -271,13 +317,19 @@ export function UploadPolicyModal({
 
               <div className="space-y-2">
                 <Label htmlFor="reviewDate">Review Date</Label>
-                <Input
-                  id="reviewDate"
-                  type="date"
-                  value={policyData.reviewDate}
-                  onChange={(e) =>
-                    setPolicyData({ ...policyData, reviewDate: e.target.value })
+                <DatePicker
+                  date={
+                    policyData.reviewDate
+                      ? new Date(policyData.reviewDate)
+                      : null
                   }
+                  onDateChange={(date) =>
+                    setPolicyData({
+                      ...policyData,
+                      reviewDate: date ? date.toISOString() : "",
+                    })
+                  }
+                  placeholder="Select review date"
                 />
               </div>
             </CardContent>
@@ -322,23 +374,6 @@ export function UploadPolicyModal({
                       </div>
                     )}
                   </label>
-                </div>
-              </div>
-
-              <div className="bg-muted/30 p-4 rounded-lg">
-                <div className="flex items-start gap-2">
-                  <AlertCircle className="h-5 w-5 text-warning mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-medium">Document Requirements:</p>
-                    <ul className="mt-2 space-y-1 text-muted-foreground">
-                      <li>• File must be in PDF, DOC, or DOCX format</li>
-                      <li>• Maximum file size: 25MB</li>
-                      <li>
-                        • Document should be properly formatted and readable
-                      </li>
-                      <li>• Include version number in the document</li>
-                    </ul>
-                  </div>
                 </div>
               </div>
             </CardContent>
@@ -408,15 +443,6 @@ export function UploadPolicyModal({
                     </div>
                   </div>
                 )}
-
-                <div className="bg-muted/30 p-4 rounded-lg">
-                  <p className="text-sm text-muted-foreground">
-                    {policyData.assignToAll
-                      ? `This policy will be assigned to all ${staffMembers?.length} staff members.`
-                      : `This policy will be assigned to ${policyData.selectedStaff.length} selected staff member(s).`}{" "}
-                    Staff will receive notifications to acknowledge this policy.
-                  </p>
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -425,7 +451,6 @@ export function UploadPolicyModal({
           <Card>
             <CardContent className="pt-6 space-y-4">
               <h3 className="text-lg font-medium flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
                 Review & Compliance
               </h3>
 

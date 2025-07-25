@@ -26,7 +26,6 @@ function DatePicker({
   onDateChange: (date: Date | null) => void;
   placeholder: string;
 }) {
-    console.log(date)
   const [open, setOpen] = useState(false);
   return (
     <Popover open={open} onOpenChange={setOpen}>

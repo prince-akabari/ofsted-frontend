@@ -392,7 +392,17 @@ export default function StaffCompliance() {
                     <Button size="sm" variant="outline">
                       Send Reminder
                     </Button> */}
-
+                      {hasRole(["staff", "admin"]) && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setOpen(true), setSelectedStaff(s);
+                          }}
+                        >
+                          Update Records
+                        </Button>
+                      )}
                       {s.status !== "compliant" &&
                         hasRole(["staff", "admin"]) && (
                           <Button
@@ -403,13 +413,6 @@ export default function StaffCompliance() {
                             Update Status
                           </Button>
                         )}
-                      <Button
-                        onClick={() => {
-                          setOpen(true), setSelectedStaff(s);
-                        }}
-                      >
-                        Update Records
-                      </Button>
 
                       {/* <Button
                         size="sm"

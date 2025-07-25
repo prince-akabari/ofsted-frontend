@@ -73,7 +73,7 @@ export function EditAuditChecklistModal({
           status: checklist.status,
           priority: checklist.priority,
           dueDate: checklist.dueDate || "",
-          assignedTo: checklist.assignedTo.id ?? "",
+          assignedTo: checklist.assignedTo?.id ?? "",
           evidence: checklist.evidence || [],
           comments: checklist.comments || "",
         });

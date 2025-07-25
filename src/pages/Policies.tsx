@@ -15,6 +15,7 @@ import { UploadPolicyModal } from "@/components/modals/UploadPolicyModal";
 import api from "@/services/apiService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { hasRole } from "@/lib/utils";
+import ViewPolicyModal from "@/components/modals/ViewPolicyModal";
 
 const policyCategories = [
   "All Categories",
@@ -32,6 +33,13 @@ export default function Policies() {
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [uploadPolicyOpen, setUploadPolicyOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [viewOpen, setViewOpen] = useState(false);
+  const [selectedPolicy, setSelectedPolicy] = useState(null);
+
+  const handleView = (policy) => {
+    setSelectedPolicy(policy);
+    setViewOpen(true);
+  };
   // Load policies on mount
   useEffect(() => {
     fetchPolicy();
@@ -59,11 +67,11 @@ export default function Policies() {
   const getStatusBadge = (status: any["status"]) => {
     const baseClasses = "px-2 py-1 rounded-full text-xs font-medium";
     switch (status) {
-      case "current":
+      case "low":
         return `${baseClasses} bg-success text-success-foreground`;
-      case "review-needed":
+      case "medium":
         return `${baseClasses} bg-warning text-warning-foreground`;
-      case "expired":
+      case "high":
         return `${baseClasses} bg-destructive text-destructive-foreground`;
       default:
         return `${baseClasses} bg-muted text-muted-foreground`;
@@ -72,12 +80,12 @@ export default function Policies() {
 
   const getStatusText = (status: any["status"]) => {
     switch (status) {
-      case "current":
-        return "Current";
-      case "review-needed":
-        return "Review Needed";
-      case "expired":
-        return "Expired";
+      case "low":
+        return "LOW PRIORITY";
+      case "medium":
+        return "MEDIUM PRIORITY";
+      case "high":
+        return "HIGH PRIORITY";
       default:
         return status;
     }
@@ -205,16 +213,29 @@ export default function Policies() {
                     <div className="flex-1 space-y-2">
                       <div className="flex items-start justify-between">
                         <div>
-                          <h3 className="font-semibold text-lg">
-                            {policy.title}
+                          <h3 className="font-semibold text-lg space-x-4">
+                            {policy.title}{" "}
+                            <Badge className={getStatusBadge(policy.status)}>
+                              {getStatusText(policy.status).toUpperCase()}
+                            </Badge>
                           </h3>
                           <p className="text-muted-foreground">
                             {policy.category}
                           </p>
                         </div>
-                        <Badge className={getStatusBadge(policy.status)}>
-                          {getStatusText(policy.status).toUpperCase()}
-                        </Badge>
+                        <div className="space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleView(policy)}
+                          >
+                            {hasRole(["staff"]) &&
+                            policy.acknowledgements !==
+                              policy.assignedStaff.length
+                              ? "Acknowledge"
+                              : "View"}
+                          </Button>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
@@ -226,7 +247,7 @@ export default function Policies() {
                           <Calendar className="h-4 w-4" />
                           <span>
                             Updated:{" "}
-                            {new Date(policy.lastUpdated).toLocaleDateString()}
+                            {new Date(policy.updatedAt).toLocaleDateString()}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -253,22 +274,7 @@ export default function Policies() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-2 ml-4">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex items-center gap-2"
-                    >
-                      <Download className="h-4 w-4" />
-                      Download
-                    </Button>
-                    <Button size="sm" variant="outline">
-                      Edit
-                    </Button>
-                    <Button size="sm" variant="outline">
-                      View
-                    </Button>
-                  </div>
+                  <div className="flex flex-col  ml-4"></div>
                 </div>
               </Card>
             ))
@@ -283,20 +289,16 @@ export default function Policies() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[
-                "Safeguarding and Child Protection Policy",
-                "Behavior Management & Physical Intervention Policy",
-                "Safer Recruitment Policy",
-                "Whistleblowing Policy",
-                "Medication Administration Policy",
-                "First Aid Policy",
-                "Care Planning Policy",
-                "Staff Supervision and Appraisal Policy",
-                "Emergency Evacuation and Fire Safety Policy",
-                "Risk Assessment Policy",
-                "Complaints Procedure",
-                "Confidentiality & Data Protection Policy",
+                "Safeguarding & Protection",
+                "Daily Living & Care",
+                "Staffing & HR",
+                "Health & Safety",
+                "Behavior Management",
+                "Education & Development",
+                "Finance & Administration",
+                "Regulatory Compliance",
               ].map((policyName) => {
-                const exists = policies.some((p) => p.title === policyName);
+                const exists = policies.some((p) => p.category === policyName);
                 return (
                   <div
                     key={policyName}
@@ -322,6 +324,12 @@ export default function Policies() {
         )}
       </div>
 
+      <ViewPolicyModal
+        isOpen={viewOpen}
+        onClose={() => setViewOpen(false)}
+        policy={selectedPolicy}
+        onUpdatePolicy={fetchPolicy}
+      />
       <UploadPolicyModal
         open={uploadPolicyOpen}
         onOpenChange={setUploadPolicyOpen}
