@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import axios from "axios";
-
 import {
   Dialog,
   DialogContent,
@@ -21,42 +19,14 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
 
 import { toast } from "react-hot-toast";
 import api from "@/services/apiService";
-
-function DatePicker({
-  date,
-  onDateChange,
-  placeholder,
-}: {
-  date: Date | null;
-  onDateChange: (date: Date | null) => void;
-  placeholder: string;
-}) {
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className={`w-full justify-start text-left font-normal ${!date && "text-muted-foreground"}`}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : placeholder}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
-          mode="single"
-          selected={date || undefined}
-          onSelect={onDateChange}
-          initialFocus
-        />
-      </PopoverContent>
-    </Popover>
-  );
-}
 
 interface AddAuditChecklistModalProps {
   open: boolean;
@@ -83,6 +53,46 @@ export function AddAuditChecklistModal({
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [staffList, setStaffList] = useState([]);
   const [evidenceInput, setEvidenceInput] = useState("");
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
+
+  function DatePicker({
+    date,
+    onDateChange,
+    placeholder,
+  }: {
+    date: Date | null;
+    onDateChange: (date: Date | null) => void;
+    placeholder: string;
+  }) {
+    return (
+      <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+        {" "}
+        {/* <-- Controlled Popover */}
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className={`w-full justify-start text-left font-normal ${
+              !date && "text-muted-foreground"
+            }`}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {date ? format(date, "PPP") : placeholder}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={date || undefined}
+            onSelect={(selectedDate) => {
+              onDateChange(selectedDate);
+              setDatePickerOpen(false); // <-- manually close popover
+            }}
+            initialFocus
+          />
+        </PopoverContent>
+      </Popover>
+    );
+  }
 
   useEffect(() => {
     api.get("/staff").then((res) => setStaffList(res.data.staff));
@@ -101,12 +111,27 @@ export function AddAuditChecklistModal({
       setEvidenceInput("");
     }
   };
+  const resetForm = () => {
+    setForm({
+      category: "",
+      item: "",
+      status: "inprogress",
+      priority: "medium",
+      dueDate: "",
+      assignedTo: "",
+      evidence: [],
+      comments: "",
+    });
+    setDueDate(null);
+    setEvidenceInput("");
+  };
 
   const handleSubmit = async () => {
     try {
       await api.post("/audit-checklist", form);
       toast.success("Audit checklist added");
       onOpenChange(false);
+      resetForm();
       if (onChecklistAdded) onChecklistAdded();
     } catch (err) {
       console.error(err);
@@ -121,7 +146,9 @@ export function AddAuditChecklistModal({
         style={{ overscrollBehavior: "contain" }}
       >
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold">Add Audit Checklist</DialogTitle>
+          <DialogTitle className="text-lg font-semibold">
+            Add Audit Checklist
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-5 pt-2">
@@ -173,11 +200,13 @@ export function AddAuditChecklistModal({
                   <SelectValue placeholder="Select Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  {["Complete", "Incomplete", "In Progress", "Overdue"].map((s) => (
-                    <SelectItem key={s.toLowerCase()} value={s.toLowerCase()}>
-                      {s}
-                    </SelectItem>
-                  ))}
+                  {["Complete", "Incomplete", "InProgress", "Overdue"].map(
+                    (s) => (
+                      <SelectItem key={s.toLowerCase()} value={s.toLowerCase()}>
+                        {s}
+                      </SelectItem>
+                    )
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -236,7 +265,7 @@ export function AddAuditChecklistModal({
           </div>
 
           {/* Evidence Files */}
-          <div>
+          {/* <div>
             <label className="text-sm font-medium">Evidence Files</label>
             <div className="flex gap-2">
               <Input
@@ -253,7 +282,7 @@ export function AddAuditChecklistModal({
                 <li key={idx}>{ev}</li>
               ))}
             </ul>
-          </div>
+          </div> */}
 
           {/* Comments */}
           <div>
@@ -266,10 +295,17 @@ export function AddAuditChecklistModal({
           </div>
         </div>
 
-        <DialogFooter className="mt-6">
-          <Button className="w-full" onClick={handleSubmit}>
-            Submit Checklist
+        <DialogFooter className="mt-6 flex justify-end gap-3">
+          <Button
+            variant="outline"
+            onClick={() => {
+              onOpenChange(false);
+              resetForm();
+            }}
+          >
+            Cancel
           </Button>
+          <Button onClick={handleSubmit}>Add Checklist</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

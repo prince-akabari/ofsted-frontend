@@ -26,6 +26,7 @@ import api from "@/services/apiService";
 import toast from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { hasRole } from "@/lib/utils";
+import UpdateRecordsModal from "@/components/modals/UpdateRecordsModal";
 
 export default function StaffCompliance() {
   const [staff, setStaff] = useState<any[]>([]);
@@ -37,6 +38,7 @@ export default function StaffCompliance() {
   const [selectedStaff, setSelectedStaff] = useState<any | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
   const [buttonLoading, setButtonLoading] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const [summary, setSummary] = useState<{
     overallCompliance: string;
@@ -401,6 +403,14 @@ export default function StaffCompliance() {
                             Update Status
                           </Button>
                         )}
+                      <Button
+                        onClick={() => {
+                          setOpen(true), setSelectedStaff(s);
+                        }}
+                      >
+                        Update Records
+                      </Button>
+
                       {/* <Button
                         size="sm"
                         variant="outline"
@@ -436,6 +446,12 @@ export default function StaffCompliance() {
         onOpenChange={setUpdateStatusOpen}
         staff={selectedStaff}
         onUpdateStaff={fetchStaff}
+      />
+      <UpdateRecordsModal
+        isOpen={open}
+        onClose={setOpen}
+        onSuccess={fetchStaff}
+        staff={selectedStaff}
       />
       <Dialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
         <DialogContent>

@@ -21,8 +21,11 @@ import {
   CheckCircle,
   AlertCircle,
   Clock,
+  Briefcase,
+  CalendarDays,
 } from "lucide-react";
 import api from "@/services/apiService";
+import { format } from "date-fns";
 
 interface TrainingStatus {
   date?: string;
@@ -45,6 +48,13 @@ interface StaffDetails {
     firstAid: TrainingStatus;
     medication: TrainingStatus;
   };
+  trainingCertificates?: { title: string; date: string }[];
+  employmentHistory?: {
+    company: string;
+    from: string;
+    to: string;
+    role: string;
+  }[];
 }
 
 interface ViewStaffModalProps {
@@ -232,7 +242,7 @@ export function ViewStaffModal({
             </div>
 
             {/* Documents Placeholder */}
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
@@ -263,6 +273,74 @@ export function ViewStaffModal({
                     </p>
                   </div>
                 </div>
+              </CardContent>
+            </Card> */}
+
+            {/* Training Certificates */}
+            {/* Training Certificates */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Training Certificates
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {data.trainingCertificates?.length > 0 ? (
+                  data.trainingCertificates.map((cert, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
+                    >
+                      <div>
+                        <div className="font-medium">{cert.title}</div>
+                        <div className="flex items-center text-sm text-muted-foreground gap-1 mt-1">
+                          <CalendarDays className="w-4 h-4" />
+                          {format(new Date(cert.date), "PPP")}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">
+                    No training certificates found.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Employment History */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Briefcase className="h-5 w-5" />
+                  Employment History
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {data.employmentHistory?.length > 0 ? (
+                  data.employmentHistory.map((job, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3 bg-muted/30 rounded-lg flex items-center gap-3"
+                      style={{ justifyContent: "space-between" }}
+                    >
+                      <div className="font-medium">{job.company}</div>
+                      <div className="flex items-center text-sm text-muted-foreground gap-1">
+                        <CalendarDays className="w-4 h-4" />
+                        {format(new Date(job.from), "PPP")} -{" "}
+                        {format(new Date(job.to), "PPP")}
+                      </div>
+                      <Badge variant="outline" className="mt-1">
+                        {job.role}
+                      </Badge>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">
+                    No employment history found.
+                  </p>
+                )}
               </CardContent>
             </Card>
           </div>

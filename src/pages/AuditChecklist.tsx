@@ -3,15 +3,30 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle, Clock, AlertCircle, Circle } from "lucide-react";
+import {
+  Calendar,
+  UserRound,
+  MessageSquareText,
+  FileText,
+  UploadCloud,
+  Pencil,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  Circle,
+  CircleCheckBig,
+} from "lucide-react";
 import { type AuditItem } from "@/data/dummyData";
 import { Skeleton } from "@/components/ui/skeleton";
 import api from "@/services/apiService";
 import { AddAuditChecklistModal } from "@/components/modals/AddAuditChecklistModal";
 import { hasRole } from "@/lib/utils";
 import { EditAuditChecklistModal } from "@/components/modals/EditAuditChecklistModal";
+import { UploadEvidenceModal } from "@/components/modals/UploadEvidenceModal";
+import toast from "react-hot-toast";
 
 export default function AuditChecklist() {
+  const baseURL = `${import.meta.env.VITE_BACKEND_URL}/documents/evidence/`;
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [auditChecklistData, setAuditChecklistData] = useState<AuditItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -20,6 +35,9 @@ export default function AuditChecklist() {
   const [selectedChecklistId, setSelectedChecklistId] = useState<string | null>(
     null
   );
+  const [isEvidenceModalOpen, setIsEvidenceModalOpen] = useState(false);
+  const [auditId, setAuditId] = useState<string | null>(null);
+  const [auditDoc, setAuditDoc] = useState<any>([]);
 
   useEffect(() => {
     fetchAuditChecklist();
@@ -96,6 +114,25 @@ export default function AuditChecklist() {
       total,
       percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
     };
+  };
+
+  const handleStatusUpdate = async (id: string, newStatus: string) => {
+    const updatePromise = api.put(`/audit-checklist/${id}`, {
+      status: newStatus,
+    });
+
+    toast.promise(updatePromise, {
+      loading: "Updating status...",
+      success: "Status updated successfully!",
+      error: "Failed to update status.",
+    });
+
+    try {
+      await updatePromise;
+      fetchAuditChecklist(); // refresh the list
+    } catch (error) {
+      console.error("Error updating audit checklist:", error);
+    }
   };
 
   return (
@@ -194,22 +231,29 @@ export default function AuditChecklist() {
                   {/* Audit Items */}
                   <div className="space-y-3">
                     {filteredItems.map((item) => (
-                      <Card key={item.id} className="p-4">
-                        <div className="flex items-start space-x-4">
-                          <div className="mt-1">
+                      <Card
+                        key={item.id}
+                        className="p-4 shadow-sm hover:shadow-md transition"
+                      >
+                        <div className="flex gap-4">
+                          {/* Status Icon */}
+                          <div className="mt-1 shrink-0">
                             {getStatusIcon(item.status)}
                           </div>
-                          <div className="flex-1 space-y-2">
-                            <div className="flex items-start justify-between">
-                              <div>
-                                <h4 className="font-medium text-foreground">
+
+                          {/* Main Content */}
+                          <div className="flex-1 space-y-3">
+                            {/* Header Row: Title + Badges */}
+                            <div className="flex flex-wrap items-center justify-between gap-4">
+                              <div className="min-w-[150px]">
+                                <h4 className="text-md font-semibold text-foreground">
                                   {item.item}
                                 </h4>
                                 <p className="text-sm text-muted-foreground">
                                   {item.category}
                                 </p>
                               </div>
-                              <div className="flex gap-2">
+                              <div className="flex gap-2 flex-wrap items-center">
                                 <Badge
                                   className={getPriorityBadge(item.priority)}
                                 >
@@ -221,56 +265,114 @@ export default function AuditChecklist() {
                               </div>
                             </div>
 
-                            {item.dueDate && (
-                              <p className="text-sm text-muted-foreground">
-                                Due:{" "}
-                                {new Date(item.dueDate).toLocaleDateString()}
-                              </p>
-                            )}
+                            {/* Horizontal Info Strip */}
+                            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                              {item.dueDate && (
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="w-4 h-4" />
+                                  <span>
+                                    Due:{" "}
+                                    {new Date(
+                                      item.dueDate
+                                    ).toLocaleDateString()}
+                                  </span>
+                                </div>
+                              )}
 
-                            {item.assignedTo && (
-                              <p className="text-sm text-muted-foreground">
-                                Assigned to:{" "}
-                                {item.assignedTo ? item.assignedTo?.name : "-"}
-                              </p>
-                            )}
+                              {item.assignedTo && (
+                                <div className="flex items-center gap-1">
+                                  <UserRound className="w-4 h-4" />
+                                  <span>
+                                    Assigned to: {item.assignedTo?.name || "-"}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
 
+                            {/* Comment (single line row) */}
                             {item.comments && (
-                              <p className="text-sm text-foreground bg-muted p-2 rounded">
-                                {item.comments}
-                              </p>
-                            )}
-
-                            {item.evidence && item.evidence.length > 0 && (
-                              <div className="text-sm">
-                                <span className="text-muted-foreground">
-                                  Evidence:{" "}
-                                </span>
-                                <span className="text-primary">
-                                  {item.evidence.join(", ")}
-                                </span>
+                              <div className="flex items-start gap-2 text-sm bg-muted p-2 rounded">
+                                <MessageSquareText className="w-4 h-4 text-muted-foreground mt-0.5" />
+                                <p className="text-foreground">
+                                  {item.comments}
+                                </p>
                               </div>
                             )}
 
-                            <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => {
-                                  setSelectedChecklistId(item.id);
-                                  setEditModalOpen(true);
-                                }}
-                              >
-                                Edit
-                              </Button>
-                              <Button size="sm" variant="outline">
-                                Upload Evidence
-                              </Button>
-                              {item.status !== "complete" && (
-                                <Button size="sm" variant="default">
-                                  Mark Complete
+                            {/* Evidence Files (inline style) */}
+                            {item.evidence && item.evidence.length > 0 && (
+                              <div className="text-sm">
+                                <p className="text-muted-foreground font-medium mb-1">
+                                  Evidence:
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  {item.evidence.map(
+                                    (fileUrl: string, idx: number) => {
+                                      const fileName = fileUrl.split("/").pop();
+                                      return (
+                                        <a
+                                          key={idx}
+                                          href={baseURL + fileUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted hover:bg-muted/80 text-primary border border-primary/20 rounded-full transition text-xs font-medium"
+                                        >
+                                          <FileText className="h-4 w-4 text-primary" />
+                                          {fileName}
+                                        </a>
+                                      );
+                                    }
+                                  )}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Action Buttons - Horizontal */}
+                            <div className="flex gap-2 pt-1">
+                              {hasRole(["admin"]) && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setSelectedChecklistId(item.id);
+                                    setEditModalOpen(true);
+                                  }}
+                                  className="gap-1"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                  Edit
                                 </Button>
                               )}
+
+                              {hasRole(["admin", "staff"]) && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setAuditId(item.id);
+                                    setIsEvidenceModalOpen(true);
+                                    setAuditDoc(item.evidence);
+                                  }}
+                                  className="gap-1"
+                                >
+                                  <UploadCloud className="w-4 h-4" />
+                                  Upload Evidence
+                                </Button>
+                              )}
+                              {hasRole(["admin", "staff"]) &&
+                                item.status !== "complete" && (
+                                  <Button
+                                    size="sm"
+                                    variant="default"
+                                    className="gap-1"
+                                    onClick={() =>
+                                      handleStatusUpdate(item.id, "complete")
+                                    }
+                                  >
+                                    <CircleCheckBig className="w-4 h-4" />
+                                    Mark as Complete
+                                  </Button>
+                                )}
                             </div>
                           </div>
                         </div>
@@ -299,6 +401,14 @@ export default function AuditChecklist() {
           }}
         />
       )}
+      <UploadEvidenceModal
+        open={isEvidenceModalOpen}
+        onOpenChange={(e) => {
+          setIsEvidenceModalOpen(e), fetchAuditChecklist();
+        }}
+        auditId={auditId}
+        initialEvidence={auditDoc}
+      />
     </div>
   );
 }

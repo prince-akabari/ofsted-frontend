@@ -47,7 +47,7 @@ export function EditAuditChecklistModal({
     status: "inprogress",
     priority: "medium",
     dueDate: "",
-    assignedTo: "", // <- updated
+    assignedTo: "",
     evidence: [] as string[],
     comments: "",
   });
@@ -73,7 +73,7 @@ export function EditAuditChecklistModal({
           status: checklist.status,
           priority: checklist.priority,
           dueDate: checklist.dueDate || "",
-          assignedTo: checklist.assignedTo ?? "",
+          assignedTo: checklist.assignedTo.id ?? "",
           evidence: checklist.evidence || [],
           comments: checklist.comments || "",
         });
@@ -247,7 +247,7 @@ export function EditAuditChecklistModal({
               </SelectContent>
             </Select>
 
-            <div>
+            {/* <div>
               <div className="flex gap-2">
                 <Input
                   placeholder="Evidence File Name"
@@ -263,7 +263,7 @@ export function EditAuditChecklistModal({
                   <li key={idx}>{ev}</li>
                 ))}
               </ul>
-            </div>
+            </div> */}
 
             <Textarea
               placeholder="Comments (optional)"

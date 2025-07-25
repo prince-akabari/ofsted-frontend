@@ -48,6 +48,9 @@ export default function Reports() {
   const [selectedType, setSelectedType] = useState("All Reports");
   const [reportsData, setReportsData] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
+  const [generatingReportIndex, setGeneratingReportIndex] = useState<
+    number | null
+  >(null);
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -88,31 +91,29 @@ export default function Reports() {
       title: "OFSTED Readiness Report",
       description: "Complete overview of inspection readiness",
       icon: <BarChart3 className="h-6 w-6 text-primary" />,
-      type: 'ofsted'
+      type: "ofsted",
     },
     {
       title: "Staff Compliance Summary",
       description: "Current status of all staff requirements",
       icon: <FileText className="h-6 w-6 text-primary" />,
-      type: 'Staff'
-
+      type: "Staff",
     },
     {
       title: "Audit Progress Report",
       description: "Detailed audit checklist completion status",
       icon: <TrendingUp className="h-6 w-6 text-primary" />,
-      type: 'audit'
-
+      type: "audit",
     },
     {
       title: "Policy Compliance Report",
       description: "Status of all policies and acknowledgements",
       icon: <FileText className="h-6 w-6 text-primary" />,
-      type: 'policy'
-
+      type: "policy",
     },
   ];
-  const handleGenerateReport = async (report: any) => {
+  const handleGenerateReport = async (report: any, index: number) => {
+    setGeneratingReportIndex(index);
     try {
       const payload = {
         title: report.title,
@@ -123,11 +124,13 @@ export default function Reports() {
       };
 
       await api.post("/reports", payload);
-      // Refetch reports or append new report to state
+
       const updatedReports = await api.get("/reports");
       setReportsData(updatedReports.data);
     } catch (error) {
       console.error("Report generation failed", error);
+    } finally {
+      setGeneratingReportIndex(null);
     }
   };
 
@@ -167,8 +170,20 @@ export default function Reports() {
                         {report.description}
                       </p>
                     </div>
-                    <Button size="sm" className="w-full" onClick={() => handleGenerateReport(report)}>
-                      Generate
+                    <Button
+                      size="sm"
+                      className="w-full"
+                      onClick={() => handleGenerateReport(report, index)}
+                      disabled={generatingReportIndex === index}
+                    >
+                      {generatingReportIndex === index ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-t-transparent border-primary"></span>
+                          Generating...
+                        </span>
+                      ) : (
+                        "Generate"
+                      )}
                     </Button>
                   </div>
                 </Card>
