@@ -9,15 +9,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Calendar, User, FileText, CheckSquare, Upload } from "lucide-react";
 import api from "@/services/apiService";
 
@@ -33,10 +26,6 @@ interface ActivityLog {
 
 export default function ActivityLogs() {
   const [logs, setLogs] = useState<ActivityLog[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterCategory, setFilterCategory] = useState("all");
-  const [filterStatus, setFilterStatus] = useState("all");
-
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalLogs, setTotalLogs] = useState(0);
@@ -47,14 +36,7 @@ export default function ActivityLogs() {
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/activity-logs?page=${page}&limit=${limit}`, {
-        params: {
-          search: searchTerm || undefined,
-          category: filterCategory !== "all" ? filterCategory : undefined,
-          status: filterStatus !== "all" ? filterStatus : undefined,
-        },
-      });
-
+      const res = await api.get(`/activity-logs?page=${page}&limit=${limit}`);
       setLogs(res.data.logs);
       setTotalPages(res.data.totalPages);
       setTotalLogs(res.data.totalLogs);
@@ -67,7 +49,7 @@ export default function ActivityLogs() {
 
   useEffect(() => {
     fetchLogs();
-  }, [page, searchTerm, filterCategory, filterStatus]);
+  }, [page]);
 
   const getIcon = (category: string) => {
     switch (category) {
@@ -103,26 +85,52 @@ export default function ActivityLogs() {
     return variants[category as keyof typeof variants];
   };
 
-  const truncate = (text: string, max: number = 20) =>
+  const truncate = (text: string, max: number = 50) =>
     text.length > max ? text.slice(0, max) + "..." : text;
 
   const renderPagination = () => {
     const pages = [];
-    for (let i = 1; i <= totalPages; i++) {
+    const delta = 2;
+    const range = [];
+    const start = Math.max(2, page - delta);
+    const end = Math.min(totalPages - 1, page + delta);
+
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+
+    if (start > 2) {
+      range.unshift("...");
+    }
+    if (end < totalPages - 1) {
+      range.push("...");
+    }
+
+    range.unshift(1);
+    if (totalPages > 1) range.push(totalPages);
+
+    for (let i = 0; i < range.length; i++) {
+      const val = range[i];
       pages.push(
-        <Button
-          key={i}
-          variant={page === i ? "default" : "outline"}
-          className="px-3 py-1 mx-1 text-sm"
-          onClick={() => setPage(i)}
-        >
-          {i}
-        </Button>
+        typeof val === "number" ? (
+          <Button
+            key={val}
+            variant={page === val ? "default" : "outline"}
+            className="px-3 py-1 mx-1 text-sm"
+            onClick={() => setPage(val)}
+          >
+            {val}
+          </Button>
+        ) : (
+          <span key={i} className="px-2 text-muted-foreground">
+            {val}
+          </span>
+        )
       );
     }
 
     return (
-      <div className="flex justify-end items-center gap-2 m-2">
+      <div className="flex justify-end items-center gap-2 m-4">
         <Button
           variant="outline"
           size="sm"
@@ -143,10 +151,29 @@ export default function ActivityLogs() {
       </div>
     );
   };
+  const formatAction = (rawAction: string, category: string) => {
+    const method = rawAction.split(" ")[0]; // e.g., DELETE
+    const categoryClean = category
+      ?.replace("AUDIT-", "Audit ")
+      ?.replace("CHECKLIST", "Checklist")
+      ?.replace(/-/g, " ")
+      ?.toLowerCase();
+
+    const actionMap: Record<string, string> = {
+      POST: "Created",
+      PUT: "Updated",
+      PATCH: "Modified",
+      DELETE: "Deleted",
+      GET: "Viewed",
+    };
+
+    const actionWord = actionMap[method] || "Did";
+
+    return `${actionWord} ${categoryClean || "item"}`;
+  };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <div className="border-b border-border bg-card">
         <div className="px-6 py-4">
           <h1 className="text-2xl font-semibold text-foreground">
@@ -158,69 +185,10 @@ export default function ActivityLogs() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="p-6 space-y-6">
-        {/* Filters */}
         <Card>
           <CardHeader>
-            <CardTitle>Filters</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Input
-                placeholder="Search activities..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setPage(1);
-                }}
-              />
-              <Select
-                value={filterCategory}
-                onValueChange={(val) => {
-                  setFilterCategory(val);
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Filter by category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="checklist">Checklist</SelectItem>
-                  <SelectItem value="document">Document</SelectItem>
-                  <SelectItem value="policy">Policy</SelectItem>
-                  <SelectItem value="compliance">Compliance</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={filterStatus}
-                onValueChange={(val) => {
-                  setFilterStatus(val);
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="success">Success</SelectItem>
-                  <SelectItem value="warning">Warning</SelectItem>
-                  <SelectItem value="error">Error</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Logs Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {loading ? "Loading..." : `Recent Activities (${totalLogs})`}
-            </CardTitle>
+            <CardTitle>Recent Activities ({totalLogs})</CardTitle>
           </CardHeader>
           <CardContent className="p-0 overflow-x-auto">
             <Table>
@@ -235,7 +203,16 @@ export default function ActivityLogs() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {logs.length === 0 ? (
+                {loading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell colSpan={6}>
+                        <Skeleton className="h-4 w-full mb-2" />
+                        <Skeleton className="h-4 w-full" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : logs.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-4">
                       No logs found.
@@ -256,8 +233,12 @@ export default function ActivityLogs() {
                           </Badge>
                         </div>
                       </TableCell>
-                      <TableCell>{truncate(log.action)}</TableCell>
-                      <TableCell>{truncate(log.details)}</TableCell>
+                      <TableCell>
+                        {formatAction(log.action, log.category)}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground text-sm">
+                        {truncate(log.details, 40)}
+                      </TableCell>
                       <TableCell>
                         <Badge className={getStatusBadge(log.status)}>
                           {log.status.toUpperCase()}
@@ -268,7 +249,6 @@ export default function ActivityLogs() {
                 )}
               </TableBody>
             </Table>
-            {/* Pagination UI */}
             {renderPagination()}
           </CardContent>
         </Card>

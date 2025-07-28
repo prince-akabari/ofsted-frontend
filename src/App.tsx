@@ -27,6 +27,7 @@ import ActivityLogs from "./pages/ActivityLogs";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import { Badge } from "./components/ui/badge";
+import ReminderDropdown from "./components/ReminderDropdown";
 
 const queryClient = new QueryClient();
 
@@ -62,14 +63,24 @@ function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="flex-1 flex flex-col">
           {/* Top Header with Sidebar Toggle */}
           <header className="h-14 flex items-center justify-between border-b border-border bg-card px-4">
+            {/* Sidebar toggle on the left */}
             <SidebarTrigger className="mr-2" />
 
-            <div className="text-sm font-medium text-muted-foreground text-right">
-              Hey, {greeting}{" "}
-              <span className="text-foreground font-semibold">{name}</span>{" "}
-              <Badge variant="outline" className="ml-2 capitalize">
-                {role}
-              </Badge>
+            {/* Right section with bell + user info */}
+            <div className="flex items-center gap-4">
+              {/* Reminder bell */}
+              <ReminderDropdown />
+
+              {/* Greeting and role info */}
+              <div className="text-sm text-muted-foreground text-right">
+                Hey,{" "}
+                <span className="text-foreground font-semibold">
+                  {name + ", " + greeting}
+                </span>{" "}
+                <Badge variant="outline" className="ml-2 capitalize">
+                  {role}
+                </Badge>
+              </div>
             </div>
           </header>
 
