@@ -168,7 +168,6 @@ export function UploadPolicyModal({
       formData.append("priority", policyData.priority || "medium");
       formData.append("reviewDate", policyData.reviewDate || "");
       formData.append("assignToAll", policyData.assignToAll.toString());
-      console.log(policyData);
       const assignedStaff = policyData.assignToAll
         ? staffMembers?.map((s) => s)
         : policyData.selectedStaff;
