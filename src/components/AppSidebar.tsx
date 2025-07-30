@@ -80,7 +80,7 @@ const adminItems = [
     icon: Activity,
     roles: ["admin"],
   },
-  { title: "Settings", url: "/settings", icon: Settings, roles: ["admin"] },
+  // { title: "Settings", url: "/settings", icon: Settings, roles: ["admin"] },
 ];
 
 export function AppSidebar() {

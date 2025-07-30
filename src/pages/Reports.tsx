@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import * as XLSX from "xlsx";
 import {
   Select,
   SelectContent,
@@ -35,17 +35,8 @@ interface Report {
   };
 }
 
-const reportTypes = [
-  "All Reports",
-  "Compliance Report",
-  "Audit Report",
-  "Safeguarding Report",
-  "Staff Report",
-  "Financial Report",
-];
-
 export default function Reports() {
-  const [selectedType, setSelectedType] = useState("All Reports");
+  const [selectedType, setSelectedType] = useState(null);
   const [reportsData, setReportsData] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [generatingReportIndex, setGeneratingReportIndex] = useState<
@@ -67,7 +58,7 @@ export default function Reports() {
   }, []);
 
   const filteredReports =
-    selectedType === "All Reports"
+    selectedType === null
       ? reportsData
       : reportsData.filter((report) => report.type === selectedType);
 
@@ -132,6 +123,19 @@ export default function Reports() {
     } finally {
       setGeneratingReportIndex(null);
     }
+  };
+
+  const handleExport = () => {
+    const worksheet = XLSX.utils.json_to_sheet(filteredReports);
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Reports");
+
+    const today = new Date();
+    const formattedDate = today.toISOString().split("T")[0];
+    const fileName = `Reports_${formattedDate}.xlsx`;
+
+    XLSX.writeFile(workbook, fileName);
   };
 
   return (
@@ -234,19 +238,24 @@ export default function Reports() {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Report History</h2>
             <div className="flex gap-4">
-              <Select value={selectedType} onValueChange={setSelectedType}>
+              <Select onValueChange={setSelectedType}>
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder="Filter by type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {reportTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
+                  <SelectItem value={null}>{"All Reports"}</SelectItem>
+                  {quickReports.map((type) => (
+                    <SelectItem key={type.title} value={type.type}>
+                      {type.type}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <Button variant="outline">Export All</Button>
+              {hasRole(["admin", "staff"]) && (
+                <Button variant="outline" onClick={handleExport}>
+                  Export All
+                </Button>
+              )}
             </div>
           </div>
 
@@ -281,24 +290,7 @@ export default function Reports() {
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Badge className={getStatusBadge(report.status)}>
-                          {report.status.toUpperCase()}
-                        </Badge>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="flex items-center gap-2"
-                          >
-                            <Download className="h-4 w-4" />
-                            Download
-                          </Button>
-                          <Button size="sm" variant="outline">
-                            View
-                          </Button>
-                        </div>
-                      </div>
+                      <div className="flex items-center gap-3"></div>
                     </div>
                   </Card>
                 ))}

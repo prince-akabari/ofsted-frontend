@@ -11,7 +11,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Calendar, User, FileText, CheckSquare, Upload } from "lucide-react";
+import {
+  Calendar,
+  User,
+  FileText,
+  CheckSquare,
+  Upload,
+  AlertCircle,
+} from "lucide-react";
 import api from "@/services/apiService";
 
 interface ActivityLog {
@@ -51,21 +58,6 @@ export default function ActivityLogs() {
     fetchLogs();
   }, [page]);
 
-  const getIcon = (category: string) => {
-    switch (category) {
-      case "AUDIT-CHECKLIST":
-        return <CheckSquare className="w-4 h-4" />;
-      case "document":
-        return <Upload className="w-4 h-4" />;
-      case "policy":
-        return <FileText className="w-4 h-4" />;
-      case "compliance":
-        return <User className="w-4 h-4" />;
-      default:
-        return <Calendar className="w-4 h-4" />;
-    }
-  };
-
   const getStatusBadge = (status: string) => {
     const variants = {
       success: "bg-green-100 text-green-800",
@@ -81,6 +73,7 @@ export default function ActivityLogs() {
       USERS: "bg-purple-100 text-purple-800",
       REPORTS: "bg-orange-100 text-orange-800",
       compliance: "bg-gray-200 text-gray-900",
+      ALERTS: "bg-red-200 text-red-900",
     };
     return variants[category as keyof typeof variants];
   };
@@ -227,7 +220,6 @@ export default function ActivityLogs() {
                       <TableCell className="font-medium">{log.user}</TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                          {getIcon(log.category)}
                           <Badge className={getCategoryBadge(log.category)}>
                             {log.category.toUpperCase()}
                           </Badge>

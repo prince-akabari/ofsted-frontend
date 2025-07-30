@@ -24,6 +24,7 @@ import { hasRole } from "@/lib/utils";
 import { EditAuditChecklistModal } from "@/components/modals/EditAuditChecklistModal";
 import { UploadEvidenceModal } from "@/components/modals/UploadEvidenceModal";
 import toast from "react-hot-toast";
+import * as XLSX from "xlsx";
 
 export default function AuditChecklist() {
   const baseURL = `${import.meta.env.VITE_BACKEND_URL}/documents/evidence/`;
@@ -135,6 +136,19 @@ export default function AuditChecklist() {
     }
   };
 
+  const handleExport = () => {
+    const worksheet = XLSX.utils.json_to_sheet(auditChecklistData);
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "AuditChecklistData");
+
+    const today = new Date();
+    const formattedDate = today.toISOString().split("T")[0];
+    const fileName = `AuditChecklistData_${formattedDate}.xlsx`;
+
+    XLSX.writeFile(workbook, fileName);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -148,11 +162,18 @@ export default function AuditChecklist() {
               OFSTED-aligned criteria and compliance tracking
             </p>
           </div>
-          {hasRole(["admin"]) && (
-            <Button onClick={() => setOpenChecklistModal(true)}>
-              Add Audit Checklist
-            </Button>
-          )}
+          <span className="flex gap-4">
+            {hasRole(["admin", "staff"]) && (
+              <Button variant="outline" onClick={handleExport}>
+                Export All
+              </Button>
+            )}
+            {hasRole(["admin"]) && (
+              <Button onClick={() => setOpenChecklistModal(true)}>
+                Add Audit Checklist
+              </Button>
+            )}
+          </span>
         </div>
       </div>
       {/* Main Content */}

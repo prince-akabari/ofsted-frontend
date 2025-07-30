@@ -57,7 +57,7 @@ export default function ViewPolicyModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[72vh] overflow-hidden">
+      <DialogContent className="max-w-3xl max-h-[75vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold flex items-center gap-2">
             <ShieldCheck className="w-6 h-6 text-primary" />
@@ -65,69 +65,70 @@ export default function ViewPolicyModal({
           </DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="h-[49vh] pr-2">
-          <div className="space-y-6 text-sm text-foreground">
-            {/* Title and Category */}
-            <div>
-              <h2 className="text-xl font-semibold flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-muted-foreground" />
-                {policy.title}
-                <Badge
-                  variant="outline"
-                  className="mt-1 text-xs bg-blue-50 border-primary-500 text-primary-600"
-                >
-                  {policy.category}
-                </Badge>
-              </h2>
+        <ScrollArea className="h-[52vh] pr-2">
+          <div className="space-y-4 text-sm text-foreground">
+            {/* Title */}
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-muted-foreground" />
+              <span className="font-medium">Title:</span>
+              <span>{policy.title}</span>
             </div>
 
-            {/* Metadata */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-muted-foreground flex items-center gap-1">
-                  <Layers3 className="w-4 h-4" /> Version
-                </p>
-                <p>{policy.version}</p>
-              </div>
+            {/* Category */}
+            <div className="flex items-center gap-2">
+              <FileText className="w-4 h-4 text-muted-foreground" />
+              <span className="font-medium">Category:</span>
+              <Badge
+                variant="outline"
+                className="text-xs bg-blue-50 border-primary-500 text-primary-600"
+              >
+                {policy.category}
+              </Badge>
+            </div>
 
-              <div>
-                <p className="text-muted-foreground flex items-center gap-1">
-                  <Info className="w-4 h-4" /> Status
-                </p>
-                <Badge
-                  variant={
-                    policy.status === "high"
-                      ? "destructive"
-                      : policy.status === "medium"
-                      ? "secondary"
-                      : "outline"
-                  }
-                  className="capitalize"
-                >
-                  {policy.status}
-                </Badge>
-              </div>
+            {/* Version */}
+            <div className="flex items-center gap-2">
+              <Layers3 className="w-4 h-4 text-muted-foreground" />
+              <span className="font-medium">Version:</span>
+              <span>{policy.version}</span>
+            </div>
 
-              <div>
-                <p className="text-muted-foreground flex items-center gap-1">
-                  <CalendarDays className="w-4 h-4" /> Last Updated
-                </p>
-                <p>{format(new Date(policy.lastUpdated), "PPP")}</p>
-              </div>
+            {/* Status */}
+            <div className="flex items-center gap-2">
+              <Info className="w-4 h-4 text-muted-foreground" />
+              <span className="font-medium">Status:</span>
+              <Badge
+                variant={
+                  policy.status === "high"
+                    ? "destructive"
+                    : policy.status === "medium"
+                    ? "secondary"
+                    : "outline"
+                }
+                className="capitalize"
+              >
+                {policy.status}
+              </Badge>
+            </div>
 
-              <div>
-                <p className="text-muted-foreground flex items-center gap-1">
-                  <CalendarDays className="w-4 h-4" /> Created At
-                </p>
-                <p>{format(new Date(policy.createdAt), "PPP")}</p>
-              </div>
+            {/* Created At */}
+            <div className="flex items-center gap-2">
+              <CalendarDays className="w-4 h-4 text-muted-foreground" />
+              <span className="font-medium">Created At:</span>
+              <span>{format(new Date(policy.createdAt), "PPP")}</span>
+            </div>
+
+            {/* Last Updated */}
+            <div className="flex items-center gap-2">
+              <CalendarDays className="w-4 h-4 text-muted-foreground" />
+              <span className="font-medium">Last Updated:</span>
+              <span>{format(new Date(policy.lastUpdated), "PPP")}</span>
             </div>
 
             {/* Document */}
-            <div>
-              <p className="text-muted-foreground mb-1 flex items-center gap-1">
-                <FileCheck2 className="w-4 h-4" /> Document
-              </p>
+            <div className="flex items-center gap-2">
+              <FileCheck2 className="w-4 h-4 text-muted-foreground" />
+              <span className="font-medium">Document:</span>
               <Badge
                 variant="outline"
                 className="mt-1 text-xs bg-blue-50 border-gray-500 text-gray-600"
@@ -140,16 +141,16 @@ export default function ViewPolicyModal({
                 >
                   <EyeIcon className="w-4 h-4" />
                   {policy.document}
-                </a>{" "}
+                </a>
               </Badge>
             </div>
 
             {/* Assigned Staff */}
             <div>
-              <p className="font-medium mb-2 flex items-center gap-2">
+              <div className="flex items-center gap-2 mb-2">
                 <Users2 className="w-4 h-4 text-muted-foreground" />
-                Assigned Staff
-              </p>
+                <span className="font-medium">Assigned Staff:</span>
+              </div>
               <div className="space-y-2">
                 {policy.assignedStaff?.map((staff) => (
                   <div

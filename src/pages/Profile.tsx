@@ -182,7 +182,7 @@ export default function Profile() {
               <TabsList>
                 <TabsTrigger value="profile">Profile</TabsTrigger>
                 <TabsTrigger value="security">Security</TabsTrigger>
-                <TabsTrigger value="documents">Documents</TabsTrigger>
+                {/* <TabsTrigger value="documents">Documents</TabsTrigger> */}
               </TabsList>
 
               <TabsContent value="profile">
@@ -305,7 +305,7 @@ export default function Profile() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="documents">
+              {/* <TabsContent value="documents">
                 <Card>
                   <CardHeader>
                     <CardTitle>My Documents</CardTitle>
@@ -345,7 +345,7 @@ export default function Profile() {
                     )}
                   </CardContent>
                 </Card>
-              </TabsContent>
+              </TabsContent> */}
             </Tabs>
           </div>
         </div>

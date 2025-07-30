@@ -322,7 +322,38 @@ export default function UserManagement() {
           </CardContent>
         </Card>
       </div>
-
+      <div className="space-y-4 p-6">
+        <h4 className="font-medium">Role Permissions</h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="p-4">
+            <h5 className="font-medium mb-2">Admin</h5>
+            <ul className="text-sm text-muted-foreground space-y-1">
+              <li>• Full access to all features</li>
+              <li>• Can manage users and settings</li>
+              <li>• Can generate all reports</li>
+              <li>• Can modify audit checklists</li>
+            </ul>
+          </Card>
+          <Card className="p-4">
+            <h5 className="font-medium mb-2">Staff</h5>
+            <ul className="text-sm text-muted-foreground space-y-1">
+              <li>• View assigned tasks</li>
+              <li>• Upload documents</li>
+              <li>• Complete audit items</li>
+              <li>• View policies</li>
+            </ul>
+          </Card>
+          <Card className="p-4">
+            <h5 className="font-medium mb-2">Read-Only</h5>
+            <ul className="text-sm text-muted-foreground space-y-1">
+              <li>• View reports and progress</li>
+              <li>• Access dashboard</li>
+              <li>• Export data</li>
+              <li>• No editing permissions</li>
+            </ul>
+          </Card>
+        </div>
+      </div>
       {/* Delete Confirmation Modal */}
       <Dialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
         <DialogContent>
