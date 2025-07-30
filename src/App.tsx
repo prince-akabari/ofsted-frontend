@@ -77,7 +77,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                 <span className="text-foreground font-semibold">
                   {name + ", " + greeting}
                 </span>{" "}
-                <Badge variant="outline" className="ml-2 capitalize">
+                <Badge variant="default" className="ml-2 capitalize">
                   {role}
                 </Badge>
               </div>
