@@ -51,12 +51,20 @@ export default function UserManagement() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
   const [buttonLoading, setButtonLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const itemsPerPage = 5;
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await api.get<User[]>("/users");
-      setUsers(res.data);
+      const res = await api.get<any>(
+        `/users?page=${page}&limit=${itemsPerPage}`
+      );
+      setUsers(res.data.users);
+      setTotalPages(res.data.totalPages);
+      setTotalUsers(res.data.totalUsers);
     } catch (error) {
       console.error("Failed to fetch users:", error);
     } finally {
@@ -66,7 +74,7 @@ export default function UserManagement() {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [page]);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,6 +152,88 @@ export default function UserManagement() {
       : "bg-red-500 text-white";
   };
 
+  const renderPagination = () => {
+    const pages = [];
+    const delta = 2; // how many numbers to show around current
+    const range = [];
+    const start = Math.max(2, page - delta);
+    const end = Math.min(totalPages - 1, page + delta);
+
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+
+    if (start > 2) {
+      range.unshift("...");
+    }
+    if (end < totalPages - 1) {
+      range.push("...");
+    }
+
+    range.unshift(1);
+    if (totalPages > 1) range.push(totalPages);
+
+    for (let i = 0; i < range.length; i++) {
+      const val = range[i];
+      pages.push(
+        typeof val === "number" ? (
+          <Button
+            key={val}
+            variant={page === val ? "default" : "outline"}
+            className="px-3 py-1 mx-1 text-sm"
+            onClick={() => setPage(val)}
+          >
+            {val}
+          </Button>
+        ) : (
+          <span key={`ellipsis-${i}`} className="px-2 text-muted-foreground">
+            {val}
+          </span>
+        )
+      );
+    }
+
+    return (
+      <div className="flex justify-end items-center gap-2 m-4">
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={page === 1}
+          onClick={() => setPage(1)}
+        >
+          {"<<"}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={page === 1}
+          onClick={() => setPage(page - 1)}
+        >
+          {"<"}
+        </Button>
+
+        {pages}
+
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={page === totalPages}
+          onClick={() => setPage(page + 1)}
+        >
+          {">"}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={page === totalPages}
+          onClick={() => setPage(totalPages)}
+        >
+          {">>"}
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="border-b border-border bg-card">
@@ -159,7 +249,7 @@ export default function UserManagement() {
 
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-medium">All Users</h2>
+          <h2 className="text-lg font-medium">All Users : {`${totalUsers}`}</h2>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button
@@ -319,6 +409,7 @@ export default function UserManagement() {
                 )}
               </TableBody>
             </Table>
+            {renderPagination()}
           </CardContent>
         </Card>
       </div>

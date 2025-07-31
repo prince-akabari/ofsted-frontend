@@ -22,3 +22,27 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   const response = await api.post<LoginResponse>("/auth/login", data);
   return response.data;
 };
+
+export interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+}
+
+export interface RegisterResponse {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
+  token: string;
+}
+
+export const registerApi = async (
+  data: RegisterRequest
+): Promise<RegisterResponse> => {
+  const response = await api.post<RegisterResponse>("/auth/register", data);
+  return response.data;
+};

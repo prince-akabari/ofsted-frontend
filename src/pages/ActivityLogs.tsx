@@ -115,7 +115,7 @@ export default function ActivityLogs() {
             {val}
           </Button>
         ) : (
-          <span key={i} className="px-2 text-muted-foreground">
+          <span key={`ellipsis-${i}`} className="px-2 text-muted-foreground">
             {val}
           </span>
         )
@@ -128,18 +128,36 @@ export default function ActivityLogs() {
           variant="outline"
           size="sm"
           disabled={page === 1}
+          onClick={() => setPage(1)}
+        >
+          {"<<"}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={page === 1}
           onClick={() => setPage(page - 1)}
         >
-          &lt;
+          {"<"}
         </Button>
+
         {pages}
+
         <Button
           variant="outline"
           size="sm"
           disabled={page === totalPages}
           onClick={() => setPage(page + 1)}
         >
-          &gt;
+          {">"}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={page === totalPages}
+          onClick={() => setPage(totalPages)}
+        >
+          {">>"}
         </Button>
       </div>
     );

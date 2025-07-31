@@ -21,13 +21,14 @@ import StaffCompliance from "./pages/StaffCompliance";
 import Policies from "./pages/Policies";
 import Alerts from "./pages/Alerts";
 import Reports from "./pages/Reports";
-import Settings from "./pages/Settings";
+// import Settings from "./pages/Settings";
 import UserManagement from "./pages/UserManagement";
 import ActivityLogs from "./pages/ActivityLogs";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import { Badge } from "./components/ui/badge";
 import ReminderDropdown from "./components/ReminderDropdown";
+import Register from "./pages/Register";
 
 const queryClient = new QueryClient();
 
@@ -124,6 +125,7 @@ const App = () => {
           <ScrollToTop />
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route
               path="*"
               element={
