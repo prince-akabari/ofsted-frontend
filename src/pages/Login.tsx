@@ -47,7 +47,7 @@ export default function Login() {
           navigate("/staff-compliance");
           break;
         case "readonly":
-          navigate("/reports");
+          navigate("/");
           break;
         default:
           navigate("/");

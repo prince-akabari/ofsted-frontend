@@ -237,18 +237,20 @@ export default function Alerts() {
               </Card>
             ))}
         </div>
-        <Button
-          onClick={() => {
-            const nextPage = page + 1;
-            setPage(nextPage);
-            fetchAlerts(nextPage * 8);
-          }}
-          variant="outline"
-          className="mt-4 w-full"
-          disabled={!hasMore}
-        >
-          {hasMore ? "More Alerts" : "No More Alerts"}
-        </Button>
+        {alertsData.length !== 0 && (
+          <Button
+            onClick={() => {
+              const nextPage = page + 1;
+              setPage(nextPage);
+              fetchAlerts(nextPage * 8);
+            }}
+            variant="outline"
+            className="mt-4 w-full"
+            disabled={!hasMore}
+          >
+            {hasMore ? "More Alerts" : "No More Alerts"}
+          </Button>
+        )}
 
         {/* Alert Settings */}
         {/* <Card className="p-6">

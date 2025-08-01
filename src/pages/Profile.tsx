@@ -124,8 +124,8 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="p-6 max-w-4xl mx-auto w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="p-6 max-w-5xl mx-auto w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Profile Card */}
           <Card className="lg:col-span-1">
             <CardHeader className="text-center">
@@ -173,7 +173,7 @@ export default function Profile() {
                         <Home className="w-4 h-4 text-muted-foreground" />
                         <span className="text-sm">
                           Home ID:{" "}
-                          <Badge variant="outline">{user.homeId} </Badge>
+                          <Badge variant="outline">{user.homeId}</Badge>
                         </span>
                         <Copy
                           className="w-4 h-4 text-muted-foreground cursor-pointer hover:text-black"
