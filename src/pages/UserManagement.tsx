@@ -46,8 +46,9 @@ export default function UserManagement() {
   const [formData, setFormData] = useState<{
     name: string;
     email: string;
+    homeId: string;
     role: "admin" | "staff" | "readonly";
-  }>({ name: "", email: "", role: "staff" });
+  }>({ name: "", email: "", homeId: "", role: "staff" });
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -79,6 +80,9 @@ export default function UserManagement() {
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     setButtonLoading(true);
+    const userStr = localStorage.getItem("user");
+    const user = userStr ? JSON.parse(userStr) : null;
+    formData.homeId = user.homeId;
     toast
       .promise(api.post("/users/invite", formData), {
         loading: "Sending invite...",
@@ -94,7 +98,12 @@ export default function UserManagement() {
 
   const handleEdit = (user: User) => {
     setEditingUser(user);
-    setFormData({ name: user.name, email: user.email, role: user.role });
+    setFormData({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      homeId: "",
+    });
     setIsDialogOpen(true);
   };
 
@@ -256,7 +265,12 @@ export default function UserManagement() {
                 disabled={buttonLoading}
                 onClick={() => {
                   setEditingUser(null);
-                  setFormData({ name: "", email: "", role: "staff" });
+                  setFormData({
+                    name: "",
+                    email: "",
+                    role: "staff",
+                    homeId: "",
+                  });
                 }}
               >
                 <Plus className="w-4 h-4 mr-2" /> Invite User

@@ -7,9 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { User, Lock, FileText, Shield } from "lucide-react";
+import { User, Lock, FileText, Shield, Home, Copy } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "@/services/apiService";
+import { hasRole } from "@/lib/utils";
 
 export default function Profile() {
   const [user, setUser] = useState({
@@ -18,9 +19,16 @@ export default function Profile() {
     role: "",
     joinDate: "",
     lastLogin: "",
+    homeId: "",
   });
 
   const [loading, setLoading] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(user.homeId);
+    toast.success("Home ID copied!");
+  };
+
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -159,17 +167,34 @@ export default function Profile() {
                 </>
               ) : (
                 <>
+                  {hasRole(["admin"]) && (
+                    <div className="flex items-center justify-between space-x-2">
+                      <div className="flex items-center space-x-2">
+                        <Home className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm">
+                          Home ID:{" "}
+                          <Badge variant="outline">{user.homeId} </Badge>
+                        </span>
+                        <Copy
+                          className="w-4 h-4 text-muted-foreground cursor-pointer hover:text-black"
+                          onClick={handleCopy}
+                        />
+                      </div>
+                    </div>
+                  )}
                   <div className="flex items-center space-x-2">
                     <User className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm">{user.email}</span>
+                    <span className="text-sm">Email: {user.email}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Shield className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm">Joined {user.joinDate}</span>
+                    <span className="text-sm">Joined: {user.joinDate}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Lock className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm">Last login {user.lastLogin}</span>
+                    <span className="text-sm">
+                      Last login: {user.lastLogin}
+                    </span>
                   </div>
                 </>
               )}

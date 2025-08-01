@@ -11,33 +11,34 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import toast from "react-hot-toast";
-import SvgIllustration from "../assets/undraw_medical-care.svg"; // same as login
+import SvgIllustration from "../assets/undraw_medical-care.svg";
 import { registerApi } from "@/api/authApi";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<string>("staff");
+  const [homeCode, setHomeCode] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email || !password) {
+
+    if (!name || !email || !password || !homeCode) {
       toast.error("All fields are required");
       return;
     }
 
     setLoading(true);
     try {
-      const response = await toast.promise(
-        registerApi({ name, email, password, role }),
+      await toast.promise(
+        registerApi({ name, email, password, code: homeCode }),
         {
           loading: "Creating your account...",
-          success: (res) => `Registration successful! Please login.`,
+          success: () => "Registration successful! Please login.",
           error: (err) =>
-            err?.response?.data?.message ||
+            err?.response?.data?.error ||
             "Registration failed, please try again.",
         },
         { style: { minWidth: "250px" } }
@@ -53,7 +54,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-white">
-      {/* Left Section */}
+      {/* Left: Illustration */}
       <div className="hidden md:flex w-1/2 items-center justify-center p-10">
         <div className="text-white text-center space-y-6">
           <img
@@ -68,7 +69,7 @@ const Register = () => {
         </div>
       </div>
 
-      {/* Right Section: Register Form */}
+      {/* Right: Form */}
       <div className="flex flex-1 items-center bg-[#1d3e54] justify-center px-6 py-12">
         <Card className="w-full max-w-md shadow-lg border border-gray-200">
           <CardHeader className="text-center">
@@ -80,60 +81,47 @@ const Register = () => {
           <CardContent>
             <form onSubmit={handleRegister} className="space-y-5">
               <div>
-                <Label htmlFor="name" className="mb-1 block">
-                  Full Name
-                </Label>
+                <Label htmlFor="name">Full Name</Label>
                 <Input
                   id="name"
                   type="text"
                   placeholder="Enter your full name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  required
                 />
               </div>
 
               <div>
-                <Label htmlFor="email" className="mb-1 block">
-                  Email
-                </Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
                 />
               </div>
 
               <div>
-                <Label htmlFor="password" className="mb-1 block">
-                  Password
-                </Label>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   type="password"
                   placeholder="Enter a strong password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
                 />
               </div>
 
               <div>
-                <Label htmlFor="role" className="mb-1 block">
-                  Role
-                </Label>
-                <select
-                  id="role"
-                  className="w-full border rounded px-3 py-2 text-sm text-gray-700"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                >
-                  <option value="staff">Staff</option>
-                  <option value="readonly">Readonly</option>
-                </select>
+                <Label htmlFor="homeCode">Home Code</Label>
+                <Input
+                  id="homeCode"
+                  type="text"
+                  placeholder="Enter your home code"
+                  value={homeCode}
+                  onChange={(e) => setHomeCode(e.target.value)}
+                />
               </div>
 
               <Button
@@ -144,12 +132,13 @@ const Register = () => {
                 {loading ? "Registering..." : "Register"}
               </Button>
             </form>
+
             <div className="text-center mt-4">
               <p className="text-sm text-[#1d3e54]">
                 Already have an account?{" "}
                 <a
                   href="/login"
-                  className="text-[#1d3e54] font-bold  hover:text-[#174257]"
+                  className="font-bold hover:text-[#174257] underline"
                 >
                   Login
                 </a>

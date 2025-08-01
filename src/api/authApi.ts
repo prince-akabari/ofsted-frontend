@@ -27,7 +27,7 @@ export interface RegisterRequest {
   name: string;
   email: string;
   password: string;
-  role: string;
+  code: string
 }
 
 export interface RegisterResponse {
@@ -35,7 +35,7 @@ export interface RegisterResponse {
     id: string;
     name: string;
     email: string;
-    role: string;
+    code: string;
   };
   token: string;
 }
